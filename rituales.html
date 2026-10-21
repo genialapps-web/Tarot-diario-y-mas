@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🪄 Rituales — P&C DW</title>
+<style>
+:root{
+  --bg1:#100830; --bg2:#2E1B69;
+  --morado:#C084FC; --lila:#E879F9; --oro:#FCD34D;
+  --texto:#F8F0FF; --suave:#DDD6FE;
+  --card:rgba(192,132,252,.09); --borde:rgba(192,132,252,.32);
+  --sombra:0 10px 40px rgba(0,0,0,.42);
+  --menu-fondo:rgba(16,8,48,.95);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;color:var(--texto);padding:70px 16px 56px;overflow-x:hidden;
+  background:radial-gradient(800px 520px at 80% -8%,rgba(232,121,249,.30),transparent 60%),radial-gradient(700px 500px at 0% 35%,rgba(252,211,77,.09),transparent 60%),linear-gradient(180deg,var(--bg1),var(--bg2) 55%,var(--bg1))}
+#estrellas{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+/* ===== MENÚ DE NAVEGACIÓN ===== */
+.menu-superior{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--menu-fondo);backdrop-filter:blur(12px);padding:10px 16px;border-bottom:1px solid rgba(192,132,252,.2)}
+.menu-contenido{max-width:460px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.menu-marca{font-weight:900;font-size:18px;color:var(--morado)}
+.menu-botones{display:flex;gap:6px}
+.menu-btn{background:transparent;border:none;color:var(--suave);font-size:11px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:.2s}
+.menu-btn.activo{background:rgba(192,132,252,.18);color:var(--texto)}
+
+.wrap{max-width:460px;margin:0 auto;position:relative;z-index:1}
+
+header{text-align:center;margin:6px 0 18px}
+.logo{font-size:52px;display:inline-block;animation:flot 4s ease-in-out infinite;filter:drop-shadow(0 6px 18px rgba(192,132,252,.6))}
+@keyframes flot{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}}
+h1{font-size:27px;font-weight:800;margin-top:4px;line-height:1.25;background:linear-gradient(90deg,var(--morado),var(--oro));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--suave);font-size:14.5px;margin-top:6px;line-height:1.5}
+.luna-hoy{display:inline-flex;align-items:center;gap:8px;margin-top:12px;background:rgba(252,211,77,.09);border:1px solid rgba(252,211,77,.28);color:var(--oro);border-radius:20px;padding:7px 14px;font-size:13px}
+.luna-hoy span{font-size:20px}
+
+.regla{background:rgba(252,211,77,.08);border:1px solid rgba(252,211,77,.25);border-radius:16px;padding:14px 16px;margin-bottom:18px;font-size:13px;line-height:1.7;color:#FDE68A}
+
+.modos{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:rgba(0,0,0,.3);border:1px solid var(--borde);border-radius:16px;padding:4px;margin-bottom:16px}
+.modo{border:none;background:transparent;color:var(--suave);font-size:11.5px;font-weight:600;padding:9px 2px;border-radius:12px;cursor:pointer;transition:.25s;line-height:1.3}
+.modo span{display:block;font-size:20px;margin-bottom:2px}
+.modo.on{background:linear-gradient(135deg,var(--morado),var(--oro));color:#1b0f3d;box-shadow:0 4px 14px rgba(192,132,252,.4)}
+
+.card{background:var(--card);border:1px solid var(--borde);border-radius:22px;padding:18px;margin-bottom:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--sombra)}
+.card h2{font-size:14.5px;font-weight:700;color:var(--morado);margin-bottom:12px}
+.card h2 small{font-weight:400;color:var(--suave);font-size:12px}
+.oculto{display:none!important}
+
+textarea{width:100%;min-height:112px;resize:none;padding:14px 16px;font-size:16px;line-height:1.65;border-radius:14px;border:2px solid rgba(192,132,252,.3);background:rgba(0,0,0,.35);color:var(--texto);outline:none;transition:.3s}
+textarea:focus{border-color:var(--oro);box-shadow:0 0 0 3px rgba(252,211,77,.15)}
+.pie{display:flex;justify-content:flex-end;font-size:12px;color:var(--suave);margin-top:8px}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.it{background:rgba(0,0,0,.25);border:1.5px solid rgba(192,132,252,.2);border-radius:14px;padding:10px 2px 8px;text-align:center;cursor:pointer;color:var(--texto);transition:.2s}
+.it span{display:block;font-size:24px;margin-bottom:3px}
+.it b{font-size:11px;font-weight:600;color:var(--suave)}
+.it:hover,.it.on{border-color:var(--oro);background:rgba(192,132,252,.2);transform:translateY(-2px)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.chip{background:rgba(252,211,77,.10);color:var(--oro);padding:8px 13px;border-radius:20px;font-size:13px;cursor:pointer;border:1.5px solid transparent;transition:.2s;user-select:none}
+.chip.on{border-color:var(--oro);background:rgba(252,211,77,.24);font-weight:600}
+
+.btn{border:none;cursor:pointer;font-weight:700;border-radius:15px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn:active{transform:scale(.97)}
+.btn-pri{background:linear-gradient(135deg,var(--morado),var(--oro));color:#1b0f3d;font-size:17px;padding:17px;box-shadow:0 8px 24px rgba(192,132,252,.42)}
+.btn-pri:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-sec{background:rgba(192,132,252,.12);border:1px solid var(--morado);color:var(--morado);font-size:14px;padding:13px}
+.btn-sec:hover{background:rgba(192,132,252,.24)}
+
+/* Resultado */
+#resultado{display:none;margin-top:22px}
+.top{text-align:center;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid rgba(252,211,77,.22)}
+.top .em{font-size:48px;line-height:1;filter:drop-shadow(0 0 18px rgba(232,121,249,.6))}
+.top h2{font-size:21px;font-weight:800;color:var(--oro);margin-top:8px;line-height:1.3}
+.tag{display:inline-block;margin-top:9px;font-size:11.5px;padding:5px 12px;border-radius:20px;background:rgba(192,132,252,.14);border:1px solid rgba(192,132,252,.35);color:var(--morado)}
+.ajuste{background:rgba(232,121,249,.09);border:1px solid rgba(232,121,249,.3);border-radius:14px;padding:12px 14px;font-size:13.5px;line-height:1.6;color:var(--suave);margin-bottom:14px}
+.bl{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--morado);border-radius:16px;padding:14px 15px;margin-bottom:12px;opacity:0;animation:ap .5s ease forwards}
+.bl h3{font-size:14.5px;color:var(--morado);margin-bottom:8px}
+.bl p{font-size:15px;line-height:1.75;margin-bottom:8px}
+.bl p:last-child{margin-bottom:0}
+.bl ul{list-style:none}
+.bl li{position:relative;padding-left:24px;font-size:14.8px;line-height:1.65;margin-bottom:6px}
+.bl li::before{content:'✦';position:absolute;left:2px;top:0;color:var(--oro)}
+.bl ol{padding-left:24px}
+.bl ol li{padding-left:4px;list-style:decimal}
+.bl ol li::before{content:none}
+.bl ol li::marker{color:var(--oro);font-weight:700}
+.bl.sagrado{border-left-color:var(--oro);background:linear-gradient(135deg,rgba(192,132,252,.16),rgba(252,211,77,.09))}
+.bl.sagrado p{font-style:italic;font-size:15.5px}
+.bl.seg{border-left-color:#fb923c;background:rgba(251,146,60,.07)}
+.bl.seg h3{color:#fdba74}
+@keyframes ap{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.cierre{margin-top:6px;padding:15px;border-radius:16px;text-align:center;border:1px solid var(--oro);background:linear-gradient(135deg,rgba(192,132,252,.22),rgba(252,211,77,.10));font-size:14.5px;line-height:1.7;font-style:italic;opacity:0;animation:ap .6s ease 1s forwards}
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+
+.cargando{text-align:center;padding:34px 10px;color:var(--morado)}
+.spinner{width:44px;height:44px;border:3px solid rgba(192,132,252,.2);border-top-color:var(--oro);border-radius:50%;animation:gira 1s linear infinite;margin:0 auto 14px}
+@keyframes gira{to{transform:rotate(360deg)}}
+.error{text-align:center;padding:12px}
+.error .t{font-size:17px;color:#ff9f9f;margin-bottom:6px}
+.error .d{font-size:14px;color:var(--suave)}
+.aviso{margin-top:22px;font-size:11.8px;color:var(--suave);text-align:center;opacity:.75;line-height:1.65}
+</style>
+</head>
+<body>
+<canvas id="estrellas"></canvas>
+
+<!-- ===== MENÚ ===== -->
+<nav class="menu-superior">
+  <div class="menu-contenido">
+    <span class="menu-marca">P&C DW</span>
+    <div class="menu-botones">
+      <button class="menu-btn" onclick="window.location.href='index.html'">🔮</button>
+      <button class="menu-btn" onclick="window.location.href='tarot.html'">🃏</button>
+      <button class="menu-btn" onclick="window.location.href='quiromancia.html'">✋</button>
+      <button class="menu-btn" onclick="window.location.href='suenos.html'">🌙</button>
+      <button class="menu-btn" onclick="window.location.href='herbolaria.html'">🌿</button>
+      <button class="menu-btn activo">🪄</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header>
+  <div class="logo">🪄</div>
+  <h1>Guía Espiritual y Rituales</h1>
+  <p class="sub">Conecta con tu luz interior: todo lo que desees, deséalo sin dañar a nadie</p>
+  <div class="luna-hoy"><span id="lunaEmoji">🌙</span><b id="lunaTxt"></b></div>
+</header>
+
+<div class="regla">✨ <b>Regla de Oro:</b> Todo ritual se hace con fe, intención pura y sin desear mal a nadie. Lo que das, regresa multiplicado. La magia verdadera nace del amor, nunca del odio.</div>
+
+<div class="modos">
+  <button class="modo on" data-m="ritual"><span>🕯️</span>Ritual</button>
+  <button class="modo" data-m="oracion"><span>🙏</span>Oración</button>
+  <button class="modo" data-m="limpieza"><span>🧹</span>Limpieza</button>
+  <button class="modo" data-m="consejo"><span>🔮</span>Consejo</button>
+</div>
+
+<section class="card">
+  <h2 id="tituloEntrada"></h2>
+  <div class="grid" id="rapidos"></div>
+  <div id="extra" class="oculto" style="margin-bottom:14px">
+    <h2 style="margin-bottom:8px">🕊️ Enfoque de la oración <small>(elige uno)</small></h2>
+    <div class="chips" id="enfoques"></div>
+  </div>
+  <textarea id="texto" maxlength="500"></textarea>
+  <div class="pie"><span id="cont">0/500</span></div>
+</section>
+
+<button class="btn btn-pri" id="btnRevelar">🪄 Revelar guía</button>
+
+<section class="card" id="resultado"></section>
+
+<p class="aviso">🪄 Contenido espiritual para inspiración y bienestar personal. No sustituye la ayuda médica, psicológica ni legal.<br>Si atraviesas un momento muy difícil, habla con alguien de confianza o un profesional.</p>
+</div>
+
+<!-- ===== FIREBASE ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+// ✅ MISMA CONFIGURACIÓN COMPARTIDA
+const firebaseConfig = {
+  apiKey: "AIzaSyCbqPKfCYfDkFeAPMVyTNOfYu187hX8PR4",
+  authDomain: "flutter-match-e246c.firebaseapp.com",
+  projectId: "flutter-match-e246c",
+  storageBucket: "flutter-match-e246c.firebasestorage.app",
+  messagingSenderId: "531038667205",
+  appId: "1:531038667205:web:1fafca6491ccc3f39c0bac",
+  measurementId: "G-SGBGJFXG8H"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const MODELO = "gpt-4o-mini";
+
+/* ============ OBTENER CLAVE DESDE FIRESTORE ============ */
+async function obtenerClaveOpenAI() {
+  try {
+    const ref = doc(db, "configuracion", "openai_api");
+    const snap = await getDoc(ref);
+    
+    if (!snap.exists) throw new Error("Configuración no encontrada en Firestore");
+    const datos = snap.data();
+    if (!datos.activa) throw new Error("Clave desactivada");
+    
+    return datos.clave;
+  } catch (error) {
+    console.error("Error leyendo clave:", error);
+    throw error;
+  }
+}
+
+/* ============ DATOS ============ */
+const MODOS = {
+  ritual:   {t:"🕯️ ¿Qué deseas atraer o trabajar?", ph:"Ej: atraer amor sincero, protección para mi hogar, abundancia, paz en mi familia, sanar heridas del pasado…", min:5,
+    q:[["❤️","Amor","Amor sincero y armonía"],["💰","Dinero","Abundancia y estabilidad económica"],["🛡️","Protección","Protección para mi hogar y familia"],["☮️","Paz","Paz interior y equilibrio espiritual"],["💚","Sanación","Bienestar y recuperación emocional"],["🍀","Suerte","Suerte y buenas oportunidades"]]},
+  oracion:  {t:"🙏 ¿Para qué situación necesitas orar?", ph:"Ej: fortaleza ante una prueba, guía para tomar una decisión, consuelo en momentos difíciles, bendición para mi familia…", min:5,
+    q:[["💪","Fortaleza","Fortaleza y fe ante pruebas"],["🧭","Guía","Guía y sabiduría para decidir"],["🕊️","Consuelo","Consuelo y paz interior"],["🏠","Hogar","Bendición para mi hogar y familia"],["🙌","Gratitud","Agradecer lo que tengo"],["🌅","Nuevo día","Comenzar el día con luz y esperanza"]]},
+  limpieza: {t:"🧹 ¿Qué deseas limpiar o liberar?", ph:"Ej: energías pesadas de mi casa, pensamientos que me atan, envidias, pesadez al llegar a casa…", min:5,
+    q:[["🏠","Casa","Energías pesadas de mi hogar"],["🧍","Mi persona","Energías pesadas de mi persona"],["👁️","Envidias","Envidias y comentarios negativos"],["💛","Carga","Carga emocional y pesadez"],["🔄","Ciclos","Cerrar un ciclo y soltar el pasado"],["💼","Trabajo","Energía pesada en mi espacio de trabajo"]]},
+  consejo:  {t:"🔮 ¿Qué inquietud espiritual tienes?", ph:"Ej: ¿cómo conectar con mi intuición?, ¿cómo saber si estoy en el camino correcto?, ¿cómo elevar mi vibración?…", min:8,
+    q:[["🧘","Meditar","¿Cómo empezar a meditar?"],["🌟","Propósito","¿Cómo descubrir mi propósito?"],["👼","Guía","¿Cómo conectar con mi guía espiritual?"],["⚡","Energía","¿Cómo elevar mi energía y vibración?"],["🔍","Intuición","¿Cómo fortalecer mi intuición?"],["💔","Soltar","¿Cómo soltar y sanar el dolor?"]]}
+};
+const ENFOQUES = ["🌍 Universal","✝️ Cristiano","🌿 Ancestral / Naturaleza","🕊️ Sin religión"];
+
+/* ============ UTILIDADES ============ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&","<":"<",">":">",'"':"&quot;","'":"&#39;"}[c]));
+const arr = a => Array.isArray(a) ? a : (a ? [a] : []);
+const parrafos = s => String(s ?? "").split(/\n+/).filter(x=>x.trim()).map(p=>`<p>${esc(p)}</p>`).join("");
+let modo = "ritual", enfoque = "Universal";
+
+/* Fase lunar (aproximada, ciclo sinódico) */
+function faseLunar(){
+  const dias = (Date.now() - Date.UTC(2000,0,6,18,14)) / 864e5;
+  const f = ((dias % 29.530588853) + 29.530588853) % 29.530588853 / 29.530588853;
+  const fases = [["🌑","Luna nueva"],["🌒","Luna creciente"],["🌓","Cuarto creciente"],["🌔","Gibosa creciente"],["🌕","Luna llena"],["🌖","Gibosa menguante"],["🌗","Cuarto menguante"],["🌘","Luna menguante"]];
+  return fases[Math.round(f*8) % 8];
+}
+const [lunaE, lunaN] = faseLunar();
+$("lunaEmoji").textContent = lunaE; $("lunaTxt").textContent = `Hoy: ${lunaN}`;
+
+/* ============ INTERFAZ ============ */
+function montar(){
+  const M = MODOS[modo];
+  $("tituloEntrada").textContent = M.t;
+  $("texto").placeholder = M.ph; $("texto").value = ""; $("cont").textContent = "0/500";
+  $("rapidos").innerHTML = "";
+  M.q.forEach(q => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "it";
+    b.innerHTML = `<span>${q[0]}</span><b>${q[1]}</b>`;
+    b.onclick = () => { $("texto").value = q[2]; $("cont").textContent = q[2].length + "/500"; document.querySelectorAll("#rapidos .it").forEach(x=>x.classList.toggle("on", x===b)); };
+    $("rapidos").appendChild(b);
+  });
+  $("extra").classList.toggle("oculto", modo !== "oracion");
+  $("resultado").style.display = "none";
+}
+document.querySelectorAll(".modo").forEach(b => b.onclick = () => {
+  modo = b.dataset.m;
+  document.querySelectorAll(".modo").forEach(x => x.classList.toggle("on", x === b));
+  montar();
+});
+ENFOQUES.forEach((e,i) => {
+  const c = document.createElement("span"); c.className = "chip" + (i===0 ? " on" : ""); c.textContent = e;
+  c.onclick = () => { enfoque = e.replace(/^\S+\s/,""); document.querySelectorAll("#enfoques .chip").forEach(x=>x.classList.toggle("on", x===c)); };
+  $("enfoques").appendChild(c);
+});
+$("texto").oninput = e => { $("cont").textContent = e.target.value.length + "/500"; document.querySelectorAll("#rapidos .it").forEach(x=>x.classList.remove("on")); };
+montar();
+
+/* ============ IA ============ */
+const BASE = `Eres un guía espiritual sabio, compasivo, humilde y ético. Respetas todas las creencias y no impones ninguna. Reglas obligatorias: (1) TODO se enfoca en la propia persona, su energía, su crecimiento y su bienestar; nunca en obligar, dominar, atar, dañar o espiar a otra persona. Si la petición implica dañar o controlar a alguien (amarres, venganza, maldiciones, hacer que alguien regrese o ame), NO la cumplas: redirígela hacia sanar, soltar y fortalecer a la propia persona, y explícalo con amabilidad en el campo "ajuste". (2) No haces predicciones definitivas ni prometes resultados; la magia y la fe son un apoyo, acompañadas de acción y cambio interior. (3) Seguridad: nunca sugieras ingerir plantas, sustancias ni objetos; recuerda no dejar velas encendidas sin vigilancia y mantener el lugar ventilado. (4) No sustituyes ayuda médica, psicológica ni legal; en temas de salud, dinero o emociones intensas, menciónalo con suavidad. (5) Si la persona expresa mucho dolor o desesperanza, responde con especial ternura e invítala a hablar con alguien de confianza o un profesional. Tono cálido, sagrado, claro y esperanzador. Usa el español.`;
+
+const FORMATOS = {
+ritual: `Ritual de luz. Fase lunar actual: ${lunaN}.
+Responde SOLO con JSON válido:
+{"emoji":"","titulo":"","ajuste":"","intencion":"",
+"materiales":[""],"cuando":"",
+"pasos":[""],"frase":"","consejo":"",
+"cierre":"Nunca desees mal a nadie, porque todo regresa multiplicado."}`,
+oracion: `Oración sincera. Responde SOLO con JSON válido:
+{"emoji":"","titulo":"","ajuste":"","motivo":"",
+"oracion":"","reflexion":""}
+Adapta al enfoque: ${enfoque}.`,
+limpieza: `Limpieza energética con amor. Responde SOLO con JSON válido:
+{"emoji":"","titulo":"","ajuste":"","que":"",
+"elementos":[""],"pasos":[""],"oracion":"",
+"mantener":[""],"cierre":""}`,
+consejo: `Consejo espiritual. Responde SOLO con JSON válido:
+{"emoji":"","titulo":"","ajuste":"",
+"respuesta":"","practicas":[""],"reflexion":""}`
+};
+
+const USUARIO = {
+  ritual: t => `Trabajo: "${t}". Dame un ritual ético de luz, solo para mi bienestar, sin afectar a nadie.`,
+  oracion: t => `Situación: "${t}". Enfoque: ${enfoque}. Escríbeme una oración sincera.`,
+  limpieza: t => `Limpiar: "${t}". Guía completa de liberación con amor.`,
+  consejo: t => `Inquietud: "${t}". Dame tu guía y reflexión.`
+};
+
+$("btnRevelar").onclick = async () => {
+  const API_KEY = await obtenerClaveOpenAI();
+  
+  const t = $("texto").value.trim();
+  if(t.length < MODOS[modo].min){ alert("🪄 Cuéntame un poco más para poder guiarte mejor ✨"); return; }
+  const btn = $("btnRevelar"), R = $("resultado"), m = modo;
+  btn.disabled = true; btn.textContent = "🪄 Conectando con la luz...";
+  R.style.display = "block";
+  R.innerHTML = `<div class="cargando"><div class="spinner"></div><p>Preparando tu guía espiritual…</p></div>`;
+  R.scrollIntoView({behavior:"smooth", block:"start"});
+  try{
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${API_KEY}` },
+      body: JSON.stringify({
+        model: MODELO, temperature: 0.85, max_tokens: 1600,
+        response_format:{ type:"json_object" },
+        messages:[{role:"system", content: BASE + "\n\n" + FORMATOS[m]},{role:"user", content: USUARIO[m](t)}]
+      })
+    });
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error?.message || "Error de la API");
+    pintar(m, JSON.parse(d.choices[0].message.content));
+  }catch(e){
+    console.error(e);
+    R.innerHTML = `<div class="error"><p class="t">⚠️ La luz se ocultó un momento</p><p class="d">Inténtalo de nuevo con fe y calma ✨</p>
+      <button class="btn btn-pri" style="margin-top:16px" id="btnRe">🪄 Reintentar</button></div>`;
+    $("btnRe").onclick = () => btn.click();
+  }finally{
+    btn.disabled = false; btn.textContent = "🪄 Revelar guía";
+  }
+};
+
+/* ============ RENDER ============ */
+const bl = (cls, t, html, i) => `<div class="bl ${cls}" style="animation-delay:${i*.15}s"><h3>${t}</h3>${html}</div>`;
+const ul = a => `<ul>${arr(a).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+const ol = a => `<ol>${arr(a).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;
+const seg = `<div class="bl seg" style="animation-delay:.9s"><h3>🕯️ Con seguridad</h3><p>Nunca dejes velas encendidas sin vigilancia, mantén el lugar ventilado y no ingieras plantas ni sustancias.</p></div>`;
+
+function pintar(m, j){
+  const cab = `<div class="top"><div class="em">${esc(j.emoji || "🪄")}</div><h2>${esc(j.titulo)}</h2><span class="tag">${m.charAt(0).toUpperCase()+m.slice(1)}</span></div>${j.ajuste ? `<div class="ajuste">💜 ${esc(j.ajuste)}</div>` : ""}`;
+  let cuerpo = "", plano = "";
+
+  if(m === "ritual"){
+    cuerpo = bl("","🕯️ Intención", `<p>${esc(j.intencion)}</p>`,0) + bl("","🧾 Materiales", ul(j.materiales),1) +
+      bl("",`${lunaE} Cuándo realizarlo`, `<p>${esc(j.cuando)}</p>`,2) + bl("","📝 Pasos del ritual", ol(j.pasos),3) +
+      bl("sagrado","✨ Frase para decir", `<p>“${esc(j.frase)}”</p>`,4) + bl("","💡 Consejo final", `<p>${esc(j.consejo)}</p>`,5) + seg +
+      `<div class="cierre">${esc(j.cierre || "Nunca desees mal a nadie, porque todo regresa multiplicado.")}</div>`;
+    plano = [`🕯️ ${j.titulo}`, `Intención: ${j.intencion}`, `Materiales: ${arr(j.materiales).join(", ")}`, `Cuándo: ${j.cuando}`,
+      "Pasos:\n" + arr(j.pasos).map((p,i)=>`${i+1}. ${p}`).join("\n"), `Frase: “${j.frase}”`, `Consejo: ${j.consejo}`].join("\n\n");
+  }
+  if(m === "oracion"){
+    cuerpo = bl("","🙏 Motivo", `<p>${esc(j.motivo)}</p>`,0) + bl("sagrado","🕊️ Oración", parrafos(j.oracion),1) +
+      `<div class="cierre">${esc(j.reflexion)}</div>`;
+    plano = [`🙏 ${j.titulo}`, j.motivo, j.oracion, `✨ ${j.reflexion}`].join("\n\n");
+  }
+  if(m === "limpieza"){
+    cuerpo = bl("","🧹 Qué vamos a limpiar", `<p>${esc(j.que)}</p>`,0) + bl("","🧾 Elementos", ul(j.elementos),1) +
+      bl("","🌿 Pasos", ol(j.pasos),2) + bl("sagrado","✨ Oración de liberación", parrafos(j.oracion),3) +
+      bl("","💡 Mantener energía alta", ul(j.mantener),4) + seg + `<div class="cierre">${esc(j.cierre)}</div>`;
+    plano = [`🧹 ${j.titulo}`, j.que, `Elementos: ${arr(j.elementos).join(", ")}`, "Pasos:\n" + arr(j.pasos).map((p,i)=>`${i+1}. ${p}`).join("\n"),
+      `Oración: ${j.oracion}`, `Mantener: ${arr(j.mantener).join("; ")}`, j.cierre].join("\n\n");
+  }
+  if(m === "consejo"){
+    cuerpo = bl("","🔮 Tu guía", parrafos(j.respuesta),0) + bl("","🌱 Prácticas sencillas", ul(j.practicas),1) +
+      `<div class="cierre">${esc(j.reflexion)}</div>`;
+    plano = [`🔮 ${j.titulo}`, j.respuesta, `Prácticas: ${arr(j.practicas).join("; ")}`, `✨ ${j.reflexion}`].join("\n\n");
+  }
+
+  $("resultado").innerHTML = cab + cuerpo +
+    `<div class="acciones"><button class="btn btn-sec" id="btnComp">📤 Compartir</button><button class="btn btn-sec" id="btnNueva">✨ Nueva guía</button></div>`;
+
+  $("btnComp").onclick = async () => {
+    if(navigator.share){ try{ await navigator.share({title:"🪄 Rituales — P&C DW", text:plano}); }catch{} }
+    else{
+      try{ await navigator.clipboard.writeText(plano); $("btnComp").textContent = "✔ Copiado"; }
+      catch{ $("btnComp").textContent = "No se pudo copiar"; }
+      setTimeout(()=>{ const b=$("btnComp"); if(b) b.textContent="📤 Compartir"; },1800);
+    }
+  };
+  $("btnNueva").onclick = () => { montar(); window.scrollTo({top:0, behavior:"smooth"}); };
+}
+
+/* ============ ESTRELLAS ============ */
+(function(){
+  const c = $("estrellas"), x = c.getContext("2d");
+  let W, H, est = [];
+  function ini(){
+    W = c.width = innerWidth; H = c.height = innerHeight;
+    est = Array.from({length: Math.min(100, Math.floor(W*H/8500))}, () => ({
+      x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5+.3, t:Math.random()*6.28, v:Math.random()*.025+.006, k:Math.random()<.25 ? "#FCD34D" : (Math.random()<.35 ? "#E879F9" : "#fff")
+    }));
+  }
+  function dib(){
+    x.clearRect(0,0,W,H);
+    est.forEach(s => { s.t += s.v; x.globalAlpha = .3 + Math.sin(s.t)*.4; x.fillStyle = s.k; x.beginPath(); x.arc(s.x,s.y,s.r,0,6.283); x.fill(); });
+    requestAnimationFrame(dib);
+  }
+  addEventListener("resize", ini); ini();
+  if(!matchMedia("(prefers-reduced-motion: reduce)").matches) dib();
+})();
+</script>
+</body>
+</html>

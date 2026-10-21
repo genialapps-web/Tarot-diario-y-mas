@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🃏 Tarot — P&C DW</title>
+<style>
+:root{
+  --bg1:#0C0616; --bg2:#231039;
+  --morado:#9D4EDD; --lila:#C77DFF; --oro:#FFD60A;
+  --texto:#F8F8FF; --suave:#C8C4E2;
+  --card:rgba(157,78,221,.10); --borde:rgba(199,125,255,.30);
+  --sombra:0 10px 40px rgba(0,0,0,.45);
+  --menu-fondo:rgba(12,6,22,.95);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;color:var(--texto);padding:70px 16px 56px;overflow-x:hidden;
+  background:radial-gradient(900px 520px at 20% -10%,rgba(157,78,221,.40),transparent 60%),radial-gradient(700px 500px at 100% 30%,rgba(255,214,10,.07),transparent 60%),linear-gradient(180deg,var(--bg1),var(--bg2) 55%,var(--bg1))}
+
+/* ===== MENÚ DE NAVEGACIÓN ===== */
+.menu-superior{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--menu-fondo);backdrop-filter:blur(12px);padding:10px 16px;border-bottom:1px solid rgba(255,214,10,.2)}
+.menu-contenido{max-width:460px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.menu-marca{font-weight:900;font-size:18px;color:var(--oro)}
+.menu-botones{display:flex;gap:8px}
+.menu-btn{background:transparent;border:none;color:var(--suave);font-size:13px;padding:6px 10px;border-radius:8px;cursor:pointer;transition:.2s}
+.menu-btn.activo{background:rgba(199,125,255,.15);color:var(--lila)}
+
+#estrellas{position:fixed;inset:0;pointer-events:none;z-index:0}
+.wrap{max-width:460px;margin:0 auto;position:relative;z-index:1}
+
+header{text-align:center;margin:6px 0 22px}
+.logo{font-size:50px;display:inline-block;animation:flot 3.4s ease-in-out infinite;filter:drop-shadow(0 6px 16px rgba(199,125,255,.5))}
+@keyframes flot{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(4deg)}}
+h1{font-size:29px;font-weight:800;margin-top:4px;background:linear-gradient(90deg,var(--lila),var(--oro));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--suave);font-size:14.5px;margin-top:4px;line-height:1.5}
+
+.card{background:var(--card);border:1px solid var(--borde);border-radius:22px;padding:18px;margin-bottom:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--sombra)}
+.card h2{font-size:14.5px;font-weight:700;color:var(--lila);margin-bottom:12px}
+
+/* Tiradas */
+.tiradas{display:grid;gap:9px}
+.tir{display:flex;align-items:center;gap:12px;text-align:left;width:100%;background:rgba(0,0,0,.25);border:1.5px solid rgba(199,125,255,.2);border-radius:16px;padding:12px 14px;color:var(--texto);cursor:pointer;transition:.25s}
+.tir .ic{font-size:26px;width:40px;text-align:center}
+.tir b{display:block;font-size:14.5px}
+.tir small{display:block;font-size:12px;color:var(--suave);margin-top:2px;line-height:1.35}
+.tir .n{margin-left:auto;font-size:11.5px;color:var(--oro);background:rgba(255,214,10,.1);padding:4px 9px;border-radius:12px;white-space:nowrap}
+.tir.on{border-color:var(--oro);background:linear-gradient(135deg,rgba(157,78,221,.28),rgba(255,214,10,.10));box-shadow:0 0 0 1px var(--oro),0 8px 22px rgba(157,78,221,.35)}
+.tir:active{transform:scale(.98)}
+
+/* Pregunta */
+textarea{width:100%;min-height:96px;resize:none;padding:14px 16px;font-size:16px;line-height:1.6;border-radius:14px;border:2px solid rgba(199,125,255,.3);background:rgba(0,0,0,.35);color:var(--texto);outline:none;transition:.3s}
+textarea:focus{border-color:var(--lila);box-shadow:0 0 0 3px rgba(199,125,255,.15)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{background:rgba(255,214,10,.10);color:var(--oro);padding:8px 13px;border-radius:20px;font-size:12.5px;cursor:pointer;border:1px solid transparent;transition:.2s}
+.chip:hover{border-color:var(--oro)}
+.fila-pie{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;color:var(--suave)}
+.sw{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.sw input{display:none}
+.sw i{width:38px;height:22px;border-radius:12px;background:rgba(255,255,255,.15);position:relative;transition:.25s}
+.sw i::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.25s}
+.sw input:checked+i{background:linear-gradient(135deg,var(--morado),var(--lila))}
+.sw input:checked+i::after{left:19px}
+
+.btn{border:none;cursor:pointer;font-weight:700;border-radius:15px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn:active{transform:scale(.97)}
+.btn-pri{background:linear-gradient(135deg,var(--morado),var(--lila));color:#fff;font-size:17px;padding:17px;box-shadow:0 8px 24px rgba(157,78,221,.45)}
+.btn-pri:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-sec{background:rgba(255,214,10,.10);border:1px solid var(--oro);color:var(--oro);font-size:14px;padding:13px}
+.btn-sec:hover{background:rgba(255,214,10,.2)}
+
+/* Mesa */
+#mesa{display:none;margin-top:22px}
+.mazo{height:170px;position:relative;display:none;margin-bottom:8px}
+.mazo.on{display:block}
+.mazo .c{position:absolute;left:50%;top:10px;width:96px;height:150px;margin-left:-48px}
+.mazo .c .dorso{position:absolute;inset:0}
+.mazo .c:nth-child(1){animation:bar1 .9s ease-in-out infinite}
+.mazo .c:nth-child(2){animation:bar2 .9s ease-in-out infinite}
+.mazo .c:nth-child(3){animation:bar3 .9s ease-in-out infinite}
+@keyframes bar1{50%{transform:translateX(-46px) rotate(-10deg)}}
+@keyframes bar2{50%{transform:translateX(0) rotate(0) translateY(-6px)}}
+@keyframes bar3{50%{transform:translateX(46px) rotate(10deg)}}
+.estado{text-align:center;color:var(--lila);font-size:14px;margin-bottom:14px}
+.cartas{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 10px;justify-items:center;margin-bottom:18px}
+.cartas.uno{grid-template-columns:1fr}
+.cartas.uno .slot{width:150px}
+.slot{width:100%;max-width:130px;perspective:900px;opacity:0;transform:translateY(24px);transition:.5s}
+.slot.in{opacity:1;transform:none}
+.et{text-align:center;font-size:11.5px;color:var(--oro);font-weight:700;margin-bottom:6px;min-height:15px;line-height:1.2}
+.carta{position:relative;width:100%;aspect-ratio:5/8;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.slot.vuelta .carta{transform:rotateY(180deg)}
+.cara,.dorso{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 8px 22px rgba(0,0,0,.5)}
+.dorso{border:2px solid var(--oro);background:
+  radial-gradient(circle at 50% 50%,rgba(255,214,10,.9) 0 3px,transparent 4px),
+  repeating-conic-gradient(from 0deg at 50% 50%,rgba(199,125,255,.22) 0 10deg,transparent 10deg 20deg),
+  linear-gradient(135deg,#2D1B69,#150B33)}
+.dorso::after{content:'';position:absolute;inset:6px;border:1px solid rgba(255,214,10,.45);border-radius:8px}
+.cara{transform:rotateY(180deg);border:2px solid var(--oro);background:linear-gradient(170deg,#2b1856,#150b33 70%);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:8px 5px;text-align:center;overflow:hidden}
+.cara::before{content:'';position:absolute;inset:4px;border:1px solid rgba(255,214,10,.35);border-radius:8px;pointer-events:none}
+.cara .num{font-size:13px;font-weight:800;color:var(--oro);letter-spacing:1px;z-index:1}
+.cara .num.p{font-size:10.5px}
+.cara .sim{font-size:38px;line-height:1;z-index:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))}
+.cara .nom{font-size:11px;font-weight:700;line-height:1.2;z-index:1;padding:0 2px}
+.cara .inv{position:absolute;top:5px;right:6px;font-size:10px;color:#ff9f9f;z-index:2}
+.cara.invertida .sim{transform:rotate(180deg)}
+.cara .glow{position:absolute;inset:0;opacity:.18}
+
+/* Lectura */
+.res-titulo{text-align:center;font-size:21px;font-weight:800;color:var(--oro);padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid rgba(255,214,10,.22)}
+.pregunta-eco{text-align:center;font-size:13.5px;color:var(--suave);font-style:italic;margin-bottom:14px}
+.resumen{font-size:15.5px;line-height:1.75;color:var(--texto);text-align:center;margin-bottom:16px}
+.lec{display:flex;gap:12px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--lila);border-radius:16px;padding:13px 14px;margin-bottom:11px;opacity:0;animation:ap .5s ease forwards}
+.lec .mini{font-size:28px;flex:none;width:36px;text-align:center}
+.lec h3{font-size:13.5px;color:var(--lila);margin-bottom:2px}
+.lec h4{font-size:14.5px;color:var(--oro);margin-bottom:5px}
+.lec p{font-size:14.5px;line-height:1.7}
+@keyframes ap{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.consejo{margin-top:14px;padding:16px;border-radius:16px;border:1px solid var(--oro);background:linear-gradient(135deg,rgba(157,78,221,.25),rgba(255,214,10,.12));opacity:0;animation:ap .6s ease .9s forwards}
+.consejo h3{color:var(--oro);font-size:14.5px;margin-bottom:6px;text-align:center}
+.consejo p{font-size:15px;line-height:1.7;text-align:center}
+.frase{text-align:center;font-style:italic;color:var(--suave);margin-top:14px;font-size:15px;line-height:1.6}
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+
+.cargando{text-align:center;padding:24px 10px;color:var(--lila)}
+.spinner{width:42px;height:42px;border:3px solid rgba(199,125,255,.2);border-top-color:var(--lila);border-radius:50%;animation:gira 1s linear infinite;margin:0 auto 12px}
+@keyframes gira{to{transform:rotate(360deg)}}
+.error{text-align:center;padding:10px}
+.error .t{font-size:17px;color:#ff9f9f;margin-bottom:6px}
+.error .d{font-size:14px;color:var(--suave)}
+.aviso{margin-top:24px;font-size:11.5px;color:var(--suave);text-align:center;opacity:.7;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- ===== MENÚ ===== -->
+<nav class="menu-superior">
+  <div class="menu-contenido">
+    <span class="menu-marca">P&C DW</span>
+    <div class="menu-botones">
+      <button class="menu-btn" onclick="window.location.href='index.html'">🔮 Horóscopo</button>
+      <button class="menu-btn activo">🃏 Tarot</button>
+      <button class="menu-btn" onclick="window.location.href='#'">✨ Más</button>
+      <button class="menu-btn" onclick="window.location.href='rituales.html'">🪄</button>
+    </div>
+  </div>
+</nav>
+
+<canvas id="estrellas"></canvas>
+<div class="wrap">
+
+<header>
+  <div class="logo">🃏</div>
+  <h1>Lectura de Tarot</h1>
+  <p class="sub">Las cartas revelan lo que tu corazón necesita saber</p>
+</header>
+
+<section class="card">
+  <h2>🎴 Elige tu tirada</h2>
+  <div class="tiradas" id="tiradas"></div>
+</section>
+
+<section class="card">
+  <h2>✍️ Tu pregunta</h2>
+  <div class="chips" id="chips"></div>
+  <textarea id="pregunta" maxlength="300" placeholder="Escribe aquí lo que deseas saber… Sé específico para una lectura más precisa. 🃏"></textarea>
+  <div class="fila-pie">
+    <label class="sw"><input type="checkbox" id="inv" checked><i></i>Cartas invertidas</label>
+    <span id="cont">0/300</span>
+  </div>
+</section>
+
+<button class="btn btn-pri" id="btnTirar">🃏 Barajar y Revelar</button>
+
+<section id="mesa">
+  <div class="mazo" id="mazo"><div class="c"><div class="dorso"></div></div><div class="c"><div class="dorso"></div></div><div class="c"><div class="dorso"></div></div></div>
+  <p class="estado" id="estado"></p>
+  <div class="cartas" id="cartas"></div>
+  <div class="card" id="resultado" style="display:none"></div>
+</section>
+
+<p class="aviso">🃏 Lectura con fines de entretenimiento y reflexión personal.<br>Tómate un momento para respirar y reflexionar.</p>
+</div>
+
+<!-- ===== FIREBASE ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+// ✅ TU CONFIGURACIÓN
+const firebaseConfig = {
+  apiKey: "AIzaSyCbqPKfCYfDkFeAPMVyTNOfYu187hX8PR4",
+  authDomain: "flutter-match-e246c.firebaseapp.com",
+  projectId: "flutter-match-e246c",
+  storageBucket: "flutter-match-e246c.firebasestorage.app",
+  messagingSenderId: "531038667205",
+  appId: "1:531038667205:web:1fafca6491ccc3f39c0bac",
+  measurementId: "G-SGBGJFXG8H"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ============ BARAJA COMPLETA (78 cartas) ============ */
+const MAYORES = [
+  ["El Loco","🃏"],["El Mago","🪄"],["La Sacerdotisa","🌙"],["La Emperatriz","👑"],["El Emperador","⚔️"],
+  ["El Sumo Sacerdote","⛪"],["Los Enamorados","❤️"],["El Carro","🐎"],["La Fuerza","💪"],["El Ermitaño","🕯️"],
+  ["La Rueda de la Fortuna","🌀"],["La Justicia","⚖️"],["El Colgado","⛓️"],["La Muerte","💀"],["La Templanza","🍷"],
+  ["El Diablo","😈"],["La Torre","🏰"],["La Estrella","⭐"],["La Luna","🌕"],["El Sol","☀️"],["El Juicio","📯"],["El Mundo","🌍"]
+];
+const ROMANOS = ["0","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
+const PALOS = [
+  {n:"Bastos", s:"🌿", c:"#ff9f43"}, {n:"Copas", s:"🏆", c:"#4dabf7"},
+  {n:"Espadas", s:"🗡️", c:"#ced4da"}, {n:"Oros", s:"🪙", c:"#ffd60a"}
+];
+const RANGOS = ["As","Dos","Tres","Cuatro","Cinco","Seis","Siete","Ocho","Nueve","Diez","Sota","Caballero","Reina","Rey"];
+const RANGO_TXT = ["A","2","3","4","5","6","7","8","9","10","Sota","Cab.","Reina","Rey"];
+
+const CARTAS = [];
+MAYORES.forEach((m,i)=>CARTAS.push({nombre:m[0], sim:m[1], num:ROMANOS[i], color:"#c77dff", mayor:true}));
+PALOS.forEach(p => RANGOS.forEach((r,i)=>CARTAS.push({nombre:`${r} de ${p.n}`, sim:p.s, num:RANGO_TXT[i], color:p.c, mayor:false, palabra:i>=10})));
+
+/* ============ TIRADAS ============ */
+const TIRADAS = {
+  "1":        {ic:"🎯", t:"Carta del Día", d:"Respuesta clara y directa", et:["Tu Carta del Día"]},
+  "3":        {ic:"⏳", t:"Pasado • Presente • Futuro", d:"Tu camino completo", et:["Pasado 🌑","Presente 🌤️","Futuro ☀️"]},
+  "5-amor":   {ic:"❤️", t:"Amor y Relaciones", d:"Todo sobre tu corazón", et:["Corazón ❤️","Desafío ⚠️","Pasado 💭","Consejo 📜","Futuro 🔮"]},
+  "5-trabajo":{ic:"💼", t:"Trabajo y Dinero", d:"Tu destino profesional", et:["Situación 📊","Obstáculo 🧱","Fortaleza 💪","Consejo 🧭","Resultado 🏆"]},
+  "10":       {ic:"🔮", t:"Cruz Celta", d:"Lectura completa y profunda", et:["Presente","Desafío","Base","Pasado","Meta","Futuro","Tú mismo","Entorno","Esperanzas","Resultado"]}
+};
+const SUGERENCIAS = ["¿Qué debo saber sobre mi amor?","¿Cómo va a ir mi trabajo?","¿Qué energía me acompaña hoy?","¿Qué decisión debo tomar?"];
+
+/* ============ ELEMENTOS ============ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&","<":"<",">":">",'"':"&quot;","'":"&#39;"}[c]));
+const dormir = ms => new Promise(r => setTimeout(r, ms));
+let tiradaSel = "1", ocupado = false;
+
+/* Selector de tirada */
+Object.entries(TIRADAS).forEach(([k,v])=>{
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "tir" + (k===tiradaSel ? " on" : ""); b.dataset.k = k;
+  b.innerHTML = `<span class="ic">${v.ic}</span><span><b>${v.t}</b><small>${v.d}</small></span><span class="n">${v.et.length} ${v.et.length===1?"carta":"cartas"}</span>`;
+  b.onclick = () => { tiradaSel = k; document.querySelectorAll(".tir").forEach(e=>e.classList.toggle("on", e===b)); };
+  $("tiradas").appendChild(b);
+});
+SUGERENCIAS.forEach(s=>{
+  const c = document.createElement("span"); c.className = "chip"; c.textContent = s;
+  c.onclick = () => { $("pregunta").value = s; $("cont").textContent = s.length+"/300"; $("pregunta").focus(); };
+  $("chips").appendChild(c);
+});
+$("pregunta").oninput = e => $("cont").textContent = e.target.value.length + "/300";
+
+/* ============ OBTENER CLAVE DESDE FIRESTORE ============ */
+async function obtenerClaveOpenAI() {
+  try {
+    const ref = doc(db, "configuracion", "openai_api");
+    const snap = await getDoc(ref);
+    
+    if (!snap.exists) {
+      throw new Error("Configuración no encontrada");
+    }
+    
+    const datos = snap.data();
+    if (!datos.activa) {
+      throw new Error("Clave desactivada");
+    }
+    
+    return datos.clave;
+  } catch (error) {
+    console.error("Error leyendo clave:", error);
+    throw error;
+  }
+}
+
+/* ============ TIRADA ============ */
+$("btnTirar").onclick = tirar;
+
+async function tirar(){
+  if(ocupado) return; ocupado = true;
+  const btn = $("btnTirar");
+  const T = TIRADAS[tiradaSel];
+  const pregunta = $("pregunta").value.trim() || "Mi destino y camino en este momento";
+  const conInv = $("inv").checked;
+
+  btn.disabled = true; btn.textContent = "🃏 Barajando las cartas...";
+  $("mesa").style.display = "block";
+  $("cartas").innerHTML = ""; $("resultado").style.display = "none";
+  $("cartas").className = "cartas" + (T.et.length === 1 ? " uno" : "");
+  $("mazo").classList.add("on"); $("estado").textContent = "Barajando… concéntrate en tu pregunta";
+  $("mesa").scrollIntoView({behavior:"smooth", block:"start"});
+
+  /* Selección aleatoria sin repetir */
+  const rnd = n => { if(window.crypto?.getRandomValues){ const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; } return Math.floor(Math.random()*n); };
+  const idx = CARTAS.map((_,i)=>i);
+  for(let i=idx.length-1;i>0;i--){ const j = rnd(i+1); [idx[i],idx[j]] = [idx[j],idx[i]]; }
+  const sel = idx.slice(0, T.et.length).map(i => ({...CARTAS[i], invertida: conInv && rnd(100) < 25}));
+
+  await dormir(1500);
+  $("mazo").classList.remove("on");
+  $("estado").textContent = "Las cartas se revelan…";
+
+  /* Crear cartas boca abajo */
+  const slots = sel.map((c,i)=>{
+    const s = document.createElement("div"); s.className = "slot";
+    s.innerHTML = `<div class="et">${esc(T.et[i])}</div>
+      <div class="carta">
+        <div class="dorso"></div>
+        <div class="cara ${c.invertida?"invertida":""}" style="--col:${c.color}">
+          <div class="glow" style="background:radial-gradient(circle at 50% 45%,${c.color},transparent 65%)"></div>
+          ${c.invertida?'<span class="inv">↧ inv.</span>':""}
+          <div class="num ${c.palabra?"p":""}">${esc(c.num)}</div>
+          <div class="sim">${c.sim}</div>
+          <div class="nom">${esc(c.nombre)}</div>
+        </div></div>`;
+    $("cartas").appendChild(s);
+    return s;
+  });
+  for(let i=0;i<slots.length;i++){ await dormir(180); slots[i].classList.add("in"); }
+
+  /* La interpretación se pide mientras las cartas giran */
+  const promesa = interpretar(pregunta, T, sel);
+  await dormir(500);
+  for(let i=0;i<slots.length;i++){ await dormir(450); slots[i].classList.add("vuelta"); }
+  await dormir(700);
+  $("estado").textContent = "✨ Interpretando tu lectura…";
+
+  const R = $("resultado");
+  R.style.display = "block";
+  R.innerHTML = `<div class="cargando"><div class="spinner"></div><p>Conectando con la sabiduría de las cartas…</p></div>`;
+  R.scrollIntoView({behavior:"smooth", block:"start"});
+
+  try{
+    const j = await promesa;
+    pintar(j, pregunta, T, sel);
+    $("estado").textContent = "";
+  }catch(e){
+    console.error(e);
+    R.innerHTML = `<div class="error"><p class="t">⚠️ Las cartas no pudieron revelarse</p><p class="d">${e.message || "Inténtalo de nuevo — a veces el universo necesita un momento."}</p>
+      <button class="btn btn-pri" style="margin-top:16px" id="btnRe">🔮 Reintentar lectura</button></div>`;
+    $("btnRe").onclick = () => { R.innerHTML = `<div class="cargando"><div class="spinner"></div><p>Interpretando…</p></div>`;
+      interpretar(pregunta, T, sel).then(j=>pintar(j,pregunta,T,sel)).catch(()=>{ R.innerHTML = `<div class="error"><p class="t">⚠️ Sigue sin responder</p><p class="d">Prueba con una nueva tirada en unos momentos.</p></div>`; }); };
+    $("estado").textContent = "";
+  }finally{
+    btn.disabled = false; btn.textContent = "🃏 Barajar y Revelar"; ocupado = false;
+  }
+}
+
+/* ============ IA ============ */
+const SISTEMA = `Eres un lector de Tarot experto, empático y sabio, con más de 20 años de experiencia. Tu interpretación es profunda, respetuosa y esperanzadora. Nunca asustas ni das mensajes negativos: transformas todo en oportunidad y aprendizaje. No hagas predicciones médicas, legales ni de muerte. Interpreta cada carta en su posición y orientación. Tono cálido y cercano.
+Responde SOLO con JSON válido:
+{"resumen":"2-3 frases con el mensaje global",
+"cartas":[{"posicion":"...","carta":"...","texto":"significado"}],
+"consejo":"consejo claro y práctico de 30-50 palabras",
+"frase":"frase inspiradora corta"}`;
+
+async function interpretar(pregunta, T, sel){
+  const API_KEY = await obtenerClaveOpenAI();
+  const MODELO = "gpt-4o-mini";
+  
+  const lista = sel.map((c,i)=>`${i+1}. "${T.et[i]}": ${c.nombre}${c.invertida?" (INVERTIDA)":""}`).join("\n");
+  const r = await fetch("https://api.openai.com/v1/chat/completions", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${API_KEY}` },
+    body: JSON.stringify({
+      model: MODELO, temperature: 0.8, max_tokens: 1800,
+      response_format:{ type:"json_object" },
+      messages:[
+        { role:"system", content:SISTEMA },
+        { role:"user", content:`Tirada: ${T.t}.\nPregunta: "${pregunta}".\nCartas:\n${lista}` }
+      ]
+    })
+  });
+  const d = await r.json();
+  if(!r.ok) throw new Error(d.error?.message || "Error de la API");
+  return JSON.parse(d.choices[0].message.content);
+}
+
+/* ============ RENDER ============ */
+function pintar(j, pregunta, T, sel){
+  const items = sel.map((c,i)=>{
+    const x = (j.cartas || [])[i] || {};
+    return {pos:T.et[i], c, texto:x.texto || ""};
+  });
+  $("resultado").innerHTML = `
+    <div class="res-titulo">🔮 Tu Lectura</div>
+    <p class="pregunta-eco">“${esc(pregunta)}”</p>
+    ${j.resumen ? `<p class="resumen">${esc(j.resumen)}</p>` : ""}
+    ${items.map((it,i)=>`
+      <div class="lec" style="animation-delay:${i*.18}s">
+        <div class="mini">${it.c.sim}</div>
+        <div><h3>${esc(it.pos)}</h3><h4>${esc(it.c.nombre)}${it.c.invertida?" (invertida)":""}</h4><p>${esc(it.texto)}</p></div>
+      </div>`).join("")}
+    <div class="consejo"><h3>🧭 Consejo de las cartas</h3><p>${esc(j.consejo)}</p></div>
+    ${j.frase ? `<p class="frase">✨ “${esc(j.frase)}”</p>` : ""}
+    <div class="acciones">
+      <button class="btn btn-sec" id="btnComp">📤 Compartir</button>
+      <button class="btn btn-sec" id="btnNueva">🃏 Nueva tirada</button>
+    </div>`;
+
+  const plano = [`🔮 Mi lectura de Tarot — ${T.t}`, `Pregunta: ${pregunta}`, j.resumen,
+    ...items.map(it=>`${it.pos} — ${it.c.nombre}${it.c.invertida?" (invertida)":""}: ${it.texto}`),
+    `🧭 ${j.consejo}`, j.frase ? `✨ ${j.frase}` : ""].filter(Boolean).join("\n\n");
+
+  $("btnComp").onclick = async () => {
+    if(navigator.share){ try{ await navigator.share({title:"🔮 Mi Tarot — P&C DW", text:plano}); }catch{} }
+    else{
+      try{ await navigator.clipboard.writeText(plano); $("btnComp").textContent = "✔ Copiado"; }
+      catch{ $("btnComp").textContent = "No se pudo copiar"; }
+      setTimeout(()=>{ const b=$("btnComp"); if(b) b.textContent="📤 Compartir"; },1800);
+    }
+  };
+  $("btnNueva").onclick = () => { $("mesa").style.display = "none"; $("pregunta").value = ""; $("cont").textContent = "0/300"; window.scrollTo({top:0, behavior:"smooth"}); };
+}
+
+/* ============ FONDO DE ESTRELLAS ============ */
+(function(){
+  const c = $("estrellas"), x = c.getContext("2d");
+  let W, H, est = [];
+  function ini(){
+    W = c.width = innerWidth; H = c.height = innerHeight;
+    est = Array.from({length: Math.min(90, Math.floor(W*H/9000))}, () => ({
+      x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.4+.3, t:Math.random()*6.28, v:Math.random()*.02+.005, d:Math.random()<.2
+    }));
+  }
+  function dib(){
+    x.clearRect(0,0,W,H);
+    est.forEach(s => { s.t += s.v; x.globalAlpha = .35 + Math.sin(s.t)*.35; x.fillStyle = s.d ? "#FFD60A" : "#fff"; x.beginPath(); x.arc(s.x,s.y,s.r,0,6.283); x.fill(); });
+    requestAnimationFrame(dib);
+  }
+  addEventListener("resize", ini); ini();
+  if(!matchMedia("(prefers-reduced-motion: reduce)").matches) dib();
+  else est.forEach(s=>{ x.globalAlpha=.5; x.fillStyle="#fff"; x.beginPath(); x.arc(s.x,s.y,s.r,0,6.283); x.fill(); });
+})();
+</script>
+</body>
+</html>

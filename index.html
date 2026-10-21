@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🔮 Oráculo Diario — P&C DW</title>
+<style>
+:root{
+  --bg1:#0F0820; --bg2:#22124A;
+  --oro:#FFD700; --naranja:#FF9500; --morado:#7B2FFD; --lila:#B794FF;
+  --texto:#F8F8FF; --suave:#CFCBE6;
+  --card:rgba(255,255,255,.06); --borde:rgba(255,215,0,.28);
+  --sombra:0 10px 40px rgba(0,0,0,.4);
+  --menu-fondo:rgba(15,8,32,.95);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;color:var(--texto);padding:70px 16px 80px;overflow-x:hidden;
+  background:radial-gradient(900px 500px at 80% -10%,rgba(123,47,253,.45),transparent 60%),radial-gradient(700px 500px at 0% 20%,rgba(255,149,0,.12),transparent 60%),linear-gradient(180deg,var(--bg1),var(--bg2) 55%,var(--bg1))}
+
+/* ===== MENÚ DE NAVEGACIÓN P&C DW ===== */
+.menu-superior{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--menu-fondo);backdrop-filter:blur(12px);padding:10px 16px;border-bottom:1px solid rgba(255,215,0,.2)}
+.menu-contenido{max-width:460px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.menu-marca{font-weight:900;font-size:18px;color:var(--oro)}
+.menu-botones{display:flex;gap:8px}
+.menu-btn{background:transparent;border:none;color:var(--suave);font-size:13px;padding:6px 10px;border-radius:8px;cursor:pointer;transition:.2s}
+.menu-btn.activo{background:rgba(255,215,0,.15);color:var(--oro)}
+
+#estrellas{position:fixed;inset:0;pointer-events:none;z-index:0}
+.wrap{max-width:460px;margin:0 auto;position:relative;z-index:1}
+
+/* Cabecera */
+header{text-align:center;margin:6px 0 22px}
+.logo{font-size:50px;display:inline-block;animation:flot 3.4s ease-in-out infinite;filter:drop-shadow(0 6px 16px rgba(255,215,0,.4))}
+@keyframes flot{50%{transform:translateY(-7px)}}
+h1{font-size:29px;font-weight:800;margin-top:4px;background:linear-gradient(90deg,var(--oro),var(--naranja));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--suave);font-size:14.5px;margin-top:4px}
+.fecha{color:var(--oro);font-size:13.5px;margin-top:8px;text-transform:capitalize;opacity:.9}
+
+/* Pestañas de periodo */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(0,0,0,.3);border:1px solid var(--borde);border-radius:16px;padding:4px;margin-bottom:18px}
+.tab{border:none;background:transparent;color:var(--suave);font-size:14px;font-weight:600;padding:11px 4px;border-radius:12px;cursor:pointer;transition:.25s}
+.tab.on{background:linear-gradient(135deg,var(--oro),var(--naranja));color:#1a0f2e;box-shadow:0 4px 14px rgba(255,149,0,.35)}
+
+/* Cuadrícula de signos */
+.titulo-sec{font-size:14px;font-weight:700;color:var(--oro);margin:0 4px 10px}
+.signos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.signo{position:relative;background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px 4px 12px;text-align:center;cursor:pointer;color:var(--texto);transition:.25s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.signo .sim{font-size:30px;line-height:1;display:block;margin-bottom:6px;color:var(--lila);transition:.25s}
+.signo b{display:block;font-size:13.5px;font-weight:700}
+.signo small{display:block;font-size:10.5px;color:var(--suave);margin-top:2px;opacity:.85}
+.signo:active{transform:scale(.96)}
+.signo.on{border-color:var(--oro);background:linear-gradient(160deg,rgba(255,215,0,.16),rgba(123,47,253,.22));box-shadow:0 0 0 1px var(--oro),0 8px 24px rgba(123,47,253,.35)}
+.signo.on .sim{color:var(--oro);transform:scale(1.12)}
+
+/* Botones */
+.btn{border:none;cursor:pointer;font-weight:700;border-radius:15px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn:active{transform:scale(.97)}
+.btn-pri{background:linear-gradient(135deg,var(--oro),var(--naranja));color:#1a0f2e;font-size:17px;padding:17px;box-shadow:0 8px 24px rgba(255,149,0,.38)}
+.btn-pri:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-sec{background:rgba(123,47,253,.2);border:1px solid var(--morado);color:var(--texto);font-size:14px;padding:13px}
+.btn-sec:hover{background:rgba(123,47,253,.32)}
+
+/* Resultado */
+#resultado{display:none;margin-top:22px}
+.card{background:var(--card);border:1px solid var(--borde);border-radius:22px;padding:22px 18px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--sombra);animation:ap .5s ease both}
+@keyframes ap{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero{text-align:center;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid rgba(255,215,0,.22)}
+.hero .gs{font-size:54px;color:var(--oro);line-height:1;text-shadow:0 0 24px rgba(255,215,0,.5)}
+.hero h2{font-size:23px;font-weight:800;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:10px}
+.chip{font-size:11.5px;padding:5px 11px;border-radius:20px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);color:var(--oro)}
+.resumen{font-size:15.5px;line-height:1.75;color:var(--suave);text-align:center;font-style:italic;margin-bottom:16px}
+
+.sec{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:14px 15px;margin-bottom:12px;opacity:0;animation:ap .5s ease forwards}
+.sec-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sec h3{font-size:14.5px;font-weight:700;color:var(--naranja)}
+.pct{font-size:12px;color:var(--oro);font-weight:700}
+.barra{height:6px;border-radius:6px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:10px}
+.barra i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--morado),var(--oro));transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.sec p{font-size:15px;line-height:1.7}
+
+.datos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 12px}
+.dato{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px;text-align:center;opacity:0;animation:ap .5s ease forwards}
+.dato small{display:block;font-size:11px;color:var(--suave);margin-bottom:4px;letter-spacing:.4px;text-transform:uppercase}
+.dato b{font-size:15px;color:var(--oro)}
+.dato.full{grid-column:1/-1}
+.nums{display:flex;justify-content:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.nums span{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:15px;color:#1a0f2e;background:linear-gradient(135deg,var(--oro),var(--naranja));box-shadow:0 4px 12px rgba(255,149,0,.35)}
+.cita{margin-top:6px;padding:16px;text-align:center;border-radius:16px;border:1px solid var(--oro);background:linear-gradient(135deg,rgba(123,47,253,.25),rgba(255,215,0,.12));font-size:15.5px;line-height:1.7;font-style:italic;opacity:0;animation:ap .6s ease 1.1s forwards}
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+
+.cargando{text-align:center;padding:36px 10px;color:var(--oro)}
+.spinner{width:46px;height:46px;border:3px solid rgba(255,215,0,.2);border-top-color:var(--oro);border-radius:50%;animation:gira 1s linear infinite;margin:0 auto 14px}
+@keyframes gira{to{transform:rotate(360deg)}}
+.error{text-align:center;padding:14px}
+.error .t{font-size:17px;color:#ff9f9f;margin-bottom:6px}
+.error .d{font-size:14px;color:var(--suave)}
+.aviso{margin-top:24px;font-size:11.5px;color:var(--suave);text-align:center;opacity:.7;line-height:1.6}
+
+/* ===== PUERTA DE ACCESO ===== */
+body.bloqueado .menu-superior,body.bloqueado .wrap,body.bloqueado #estrellas{display:none}
+#puerta{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;padding:20px;
+  background:radial-gradient(900px 500px at 80% -10%,rgba(123,47,253,.45),transparent 60%),linear-gradient(180deg,var(--bg1),var(--bg2))}
+body.bloqueado #puerta{display:flex}
+.puerta-box{width:100%;max-width:380px;text-align:center;background:var(--card);border:1px solid var(--borde);border-radius:22px;padding:30px 22px;box-shadow:var(--sombra)}
+.puerta-box .logo{font-size:46px}
+.puerta-box h2{font-size:23px;margin-top:4px;background:linear-gradient(90deg,var(--oro),var(--naranja));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.puerta-box p{color:var(--suave);font-size:14px;margin:6px 0 18px}
+#codigoIn{width:100%;padding:14px;border-radius:13px;border:1px solid var(--borde);background:rgba(0,0,0,.3);color:var(--oro);font:800 19px monospace;letter-spacing:2px;text-align:center;text-transform:uppercase;outline:0}
+#codigoIn:focus{border-color:var(--oro)}
+#puertaErr{color:#ff7b7b;font-size:13.5px;min-height:20px;margin:10px 0 4px}
+.puerta-box .btn-pri{margin-top:6px}
+.salir-cod{background:none;border:none;color:var(--suave);font-size:12px;text-decoration:underline;cursor:pointer;margin:14px auto 0;display:block;opacity:.7}
+</style>
+</head>
+<body class="bloqueado">
+
+<!-- ===== PUERTA DE ACCESO ===== -->
+<div id="puerta">
+  <div class="puerta-box">
+    <div class="logo">🔮</div>
+    <h2>Oráculo Diario</h2>
+    <p>Ingresa tu código de acceso para entrar</p>
+    <input id="codigoIn" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false">
+    <div id="puertaErr"></div>
+    <button class="btn btn-pri" id="btnEntrar">Entrar</button>
+  </div>
+</div>
+
+
+<!-- ===== MENÚ PRINCIPAL ===== -->
+<nav class="menu-superior">
+  <div class="menu-contenido">
+    <span class="menu-marca">P&C DW</span>
+    <div class="menu-botones">
+      <button class="menu-btn activo" data-seccion="horoscopo">🔮 Horóscopo</button>
+      <button class="menu-btn" data-seccion="tarot">🃏 Tarot</button>
+      <button class="menu-btn" data-seccion="mas">✨ Más</button>
+      <button class="menu-btn" onclick="window.location.href='rituales.html'">🪄</button>
+    </div>
+  </div>
+</nav>
+
+<canvas id="estrellas"></canvas>
+<div class="wrap">
+
+<!-- ===== SECCIÓN: HORÓSCOPO ===== -->
+<section id="seccion-horoscopo" class="pagina">
+<header>
+  <div class="logo">✨</div>
+  <h1>Oráculo Diario</h1>
+  <p class="sub">Tu destino revelado cada día</p>
+  <p class="fecha" id="fechaHoy"></p>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab on" data-p="hoy">Hoy</button>
+  <button class="tab" data-p="mañana">Mañana</button>
+  <button class="tab" data-p="semana">Esta semana</button>
+</div>
+
+<p class="titulo-sec">♈ Elige tu signo zodiacal</p>
+<div class="signos" id="signos"></div>
+
+<button class="btn btn-pri" id="btnGenerar">🔮 Consultar mi Horóscopo</button>
+
+<section id="resultado"></section>
+
+<p class="aviso">🔮 Lectura generada con guía espiritual, para entretenimiento y reflexión.<br>Las estrellas inspiran, tú decides.</p>
+</section>
+
+<!-- ===== SECCIONES LISTAS PARA AGREGAR ===== -->
+<section id="seccion-tarot" class="pagina" style="display:none;padding-top:20px;">
+  <header>
+    <div class="logo">🃏</div>
+    <h1>Tarot</h1>
+    <p class="sub">Próximamente — Lectura de tu destino</p>
+  </header>
+  <p style="text-align:center;color:var(--suave);margin-top:30px;">Estamos preparando todo para ti ✨<br>Vuelve pronto.</p>
+</section>
+
+<section id="seccion-mas" class="pagina" style="display:none;padding-top:20px;">
+  <header>
+    <div class="logo">🌿</div>
+    <h1>Más Servicios</h1>
+    <p class="sub">Herbolaria · Sueños · Quiromancia</p>
+  </header>
+  <p style="text-align:center;color:var(--suave);margin-top:30px;">Todo en un solo lugar ✨<br>Próximamente en P&C DW.</p>
+</section>
+
+</div>
+
+<!-- ===== FIREBASE ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+// ✅ TU CONFIGURACIÓN — SIN CLAVES SECRETAS AQUÍ
+const firebaseConfig = {
+  apiKey: "AIzaSyCbqPKfCYfDkFeAPMVyTNOfYu187hX8PR4",
+  authDomain: "flutter-match-e246c.firebaseapp.com",
+  projectId: "flutter-match-e246c",
+  storageBucket: "flutter-match-e246c.firebasestorage.app",
+  messagingSenderId: "531038667205",
+  appId: "1:531038667205:web:1fafca6491ccc3f39c0bac",
+  measurementId: "G-SGBGJFXG8H"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ============ ACCESO POR CÓDIGO (generado en admin.html) ============ */
+// Mismo proyecto Firebase y colección que usa admin.html
+const appAcc = initializeApp({
+  apiKey:"AIzaSyCBZki64bsD7E7eCx19EAFPjlpDvngUf7o",
+  authDomain:"rider-tv.firebaseapp.com",
+  projectId:"rider-tv",
+  storageBucket:"rider-tv.firebasestorage.app",
+  messagingSenderId:"170739641097",
+  appId:"1:170739641097:web:7bda16abe08ff26516c1d8"
+}, "acceso");
+const dbAcc = getFirestore(appAcc);
+const COL_ACCESO = "accesos_permanentes";
+
+const idDispositivo = (() => {
+  try{
+    let d = localStorage.getItem("od_dev");
+    if(!d){ d = (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(36).slice(2)); localStorage.setItem("od_dev", d); }
+    return d;
+  }catch{ return "sin-storage"; }
+})();
+
+// Devuelve {ok:true} | {ok:false, motivo, borrar} ; borrar=true => el código guardado ya no sirve
+async function validarCodigo(cod){
+  cod = String(cod||"").trim().toUpperCase();
+  if(!cod || cod.includes("/")) return {ok:false, motivo:"Código inválido", borrar:true};
+  try{
+    const ref = doc(dbAcc, COL_ACCESO, cod);
+    const snap = await getDoc(ref);
+    if(!snap.exists()) return {ok:false, motivo:"Código inválido", borrar:true};
+    const d = snap.data();
+    if(!d.activo) return {ok:false, motivo:"Este código está desactivado", borrar:true};
+    const disp = Array.isArray(d.dispositivos) ? d.dispositivos : [];
+    const max = d.maxDispositivos || 3;
+    if(disp.includes(idDispositivo)){
+      updateDoc(ref, {ultimoUso: serverTimestamp()}).catch(()=>{});
+      return {ok:true, cod};
+    }
+    if(disp.length >= max) return {ok:false, motivo:"Este código ya alcanzó su límite de dispositivos", borrar:true};
+    await updateDoc(ref, {dispositivos: arrayUnion(idDispositivo), ultimoUso: serverTimestamp()});
+    return {ok:true, cod};
+  }catch(e){
+    console.error(e);
+    return {ok:false, motivo:"No se pudo verificar el código. Revisa tu conexión e inténtalo de nuevo.", borrar:false};
+  }
+}
+
+function abrirApp(){ document.body.classList.remove("bloqueado"); window.dispatchEvent(new Event("resize")); }
+function mostrarPuerta(msg){
+  document.body.classList.add("bloqueado");
+  document.getElementById("puertaErr").textContent = msg || "";
+}
+
+document.getElementById("btnEntrar").onclick = async () => {
+  const b = document.getElementById("btnEntrar"), inp = document.getElementById("codigoIn");
+  const cod = inp.value.trim().toUpperCase();
+  if(!cod){ document.getElementById("puertaErr").textContent = "Escribe tu código"; return; }
+  b.disabled = true; b.textContent = "Verificando…"; document.getElementById("puertaErr").textContent = "";
+  const r = await validarCodigo(cod);
+  b.disabled = false; b.textContent = "Entrar";
+  if(r.ok){ try{ localStorage.setItem("od_cod", r.cod); }catch{} abrirApp(); }
+  else document.getElementById("puertaErr").textContent = r.motivo;
+};
+document.getElementById("codigoIn").addEventListener("keydown", e => { if(e.key==="Enter") document.getElementById("btnEntrar").click(); });
+
+// Al cargar: revalidar el código guardado (si el admin lo desactiva, pierde el acceso)
+(async () => {
+  let guardado = null; try{ guardado = localStorage.getItem("od_cod"); }catch{}
+  if(!guardado){ mostrarPuerta(); return; }
+  const r = await validarCodigo(guardado);
+  if(r.ok) abrirApp();
+  else{
+    if(r.borrar){ try{ localStorage.removeItem("od_cod"); }catch{} }
+    mostrarPuerta(r.motivo);
+  }
+})();
+
+/* ============ DATOS ============ */
+const SIGNOS = [
+  {n:"Aries",s:"♈",f:"21 mar – 19 abr",e:"Fuego",p:"Marte"},
+  {n:"Tauro",s:"♉",f:"20 abr – 20 may",e:"Tierra",p:"Venus"},
+  {n:"Géminis",s:"♊",f:"21 may – 20 jun",e:"Aire",p:"Mercurio"},
+  {n:"Cáncer",s:"♋",f:"21 jun – 22 jul",e:"Agua",p:"Luna"},
+  {n:"Leo",s:"♌",f:"23 jul – 22 ago",e:"Fuego",p:"Sol"},
+  {n:"Virgo",s:"♍",f:"23 ago – 22 sep",e:"Tierra",p:"Mercurio"},
+  {n:"Libra",s:"♎",f:"23 sep – 22 oct",e:"Aire",p:"Venus"},
+  {n:"Escorpio",s:"♏",f:"23 oct – 21 nov",e:"Agua",p:"Plutón"},
+  {n:"Sagitario",s:"♐",f:"22 nov – 21 dic",e:"Fuego",p:"Júpiter"},
+  {n:"Capricornio",s:"♑",f:"22 dic – 19 ene",e:"Tierra",p:"Saturno"},
+  {n:"Acuario",s:"♒",f:"20 ene – 18 feb",e:"Aire",p:"Urano"},
+  {n:"Piscis",s:"♓",f:"19 feb – 20 mar",e:"Agua",p:"Neptuno"}
+];
+
+/* ============ ELEMENTOS Y ESTADO ============ */
+const $ = id => document.getElementById(id);
+const contSignos = $("signos"), resultado = $("resultado"), btn = $("btnGenerar");
+let signoSel = null, periodo = "hoy";
+const hoy = new Date();
+const optF = { weekday:"long", day:"numeric", month:"long", year:"numeric" };
+$("fechaHoy").textContent = hoy.toLocaleDateString("es-ES", optF);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&","<":"<",">":">",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ===== NAVEGACIÓN DE MENÚ ===== */
+document.querySelectorAll(".menu-btn").forEach(boton => {
+  boton.addEventListener("click", () => {
+    document.querySelectorAll(".menu-btn").forEach(b => b.classList.remove("activo"));
+    document.querySelectorAll(".pagina").forEach(p => p.style.display = "none");
+    boton.classList.add("activo");
+    const seccion = boton.dataset.seccion;
+    $(`seccion-${seccion}`).style.display = "block";
+  });
+});
+
+/* Signos */
+SIGNOS.forEach((x,i)=>{
+  const b = document.createElement("button");
+  b.className = "signo"; b.type = "button"; b.setAttribute("aria-label", x.n);
+  b.innerHTML = `<span class="sim">${x.s}</span><b>${x.n}</b><small>${x.f}</small>`;
+  b.onclick = () => {
+    signoSel = i;
+    document.querySelectorAll(".signo").forEach(e => e.classList.remove("on"));
+    b.classList.add("on");
+  };
+  contSignos.appendChild(b);
+});
+
+/* Pestañas de periodo */
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  document.querySelectorAll(".tab").forEach(e => e.classList.remove("on"));
+  t.classList.add("on"); periodo = t.dataset.p;
+});
+
+/* ============ CACHÉ DIARIA ============ */
+const claveCache = (i,p) => `horo:${hoy.toISOString().slice(0,10)}:${i}:${p}`;
+const leerCache = k => { try{ return JSON.parse(localStorage.getItem(k)); }catch{ return null; } };
+const guardarCache = (k,v) => { try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} };
+
+/* ============ OBTENER CLAVE DESDE FIRESTORE ============ */
+async function obtenerClaveOpenAI() {
+  try {
+    const ref = doc(db, "configuracion", "openai_api");
+    const snap = await getDoc(ref);
+    
+    if (!snap.exists()) {
+      throw new Error("Configuración no encontrada");
+    }
+    
+    const datos = snap.data();
+    if (!datos.activa) {
+      throw new Error("Clave desactivada");
+    }
+    
+    return datos.clave;
+  } catch (error) {
+    console.error("Error leyendo clave:", error);
+    throw error;
+  }
+}
+
+/* ============ PROMPT DEL SISTEMA ============ */
+const SISTEMA = `Eres un astrólogo sabio, cálido y positivo con más de 30 años de experiencia. Escribes horóscopos con tono cercano, respetuoso y esperanzador; honesto pero siempre constructivo, con consejos prácticos y motivadores. Personaliza según el signo, su elemento y su planeta regente; evita frases genéricas. No hagas predicciones médicas, de muerte ni alarmantes.
+Responde SOLO con JSON válido con esta forma exacta:
+{"resumen":"1-2 frases con la energía general del periodo",
+"amor":{"nivel":0-100,"texto":"45-60 palabras"},
+"dinero":{"nivel":0-100,"texto":"45-60 palabras"},
+"salud":{"nivel":0-100,"texto":"45-60 palabras"},
+"numeros":[5 números enteros entre 1 y 60],
+"color":"un color de la suerte",
+"compatible":"un signo zodiacal compatible",
+"frase":"frase inspiradora corta"}`;
+
+/* ============ CONSULTA ============ */
+btn.onclick = async () => {
+  if(signoSel === null){ alert("✨ Por favor, selecciona tu signo zodiacal"); return; }
+  const sg = SIGNOS[signoSel];
+  const k = claveCache(signoSel, periodo);
+  const enCache = leerCache(k);
+  if(enCache){ pintar(sg, enCache); return; }
+
+  btn.disabled = true; btn.textContent = "🔮 Consultando las estrellas...";
+  resultado.style.display = "block";
+  resultado.innerHTML = `<div class="card"><div class="cargando"><div class="spinner"></div><p>Conectando con el universo…</p><p style="font-size:13px;margin-top:6px;opacity:.7">Preparando tu mensaje personalizado</p></div></div>`;
+  resultado.scrollIntoView({behavior:"smooth", block:"start"});
+
+  let cuando = `de hoy (${hoy.toLocaleDateString("es-ES", optF)})`;
+  if(periodo === "mañana"){ const m = new Date(hoy.getTime()+864e5); cuando = `de mañana (${m.toLocaleDateString("es-ES", optF)})`; }
+  if(periodo === "semana") cuando = `de esta semana (semana del ${hoy.toLocaleDateString("es-ES", optF)})`;
+
+  try{
+    // 🔒 LEER CLAVE DESDE FIRESTORE
+    const API_KEY = await obtenerClaveOpenAI();
+    const MODELO = "gpt-4o-mini";
+
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method:"POST",
+      headers:{ 
+        "Content-Type":"application/json", 
+        "Authorization":`Bearer ${API_KEY}` 
+      },
+      body: JSON.stringify({
+        model: MODELO, 
+        temperature: 0.85, 
+        max_tokens: 900,
+        response_format:{ type:"json_object" },
+        messages:[
+          { role:"system", content:SISTEMA },
+          { role:"user", content:`Signo: ${sg.n} (elemento ${sg.e}, regente ${sg.p}). Dame mi horóscopo completo ${cuando}.` }
+        ]
+      })
+    });
+
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error?.message || "Error de la API");
+    
+    const j = JSON.parse(d.choices[0].message.content);
+    guardarCache(k, j);
+    pintar(sg, j);
+    
+  }catch(e){
+    console.error(e);
+    resultado.innerHTML = `<div class="card"><div class="error"><p class="t">⚠️ No pudimos conectar con el universo</p><p class="d">${e.message || "Inténtalo de nuevo en unos momentos."}</p><button class="btn btn-pri" style="margin-top:16px" id="btnRe">🔮 Reintentar</button></div></div>`;
+    $("btnRe").onclick = () => btn.click();
+  }finally{
+    btn.disabled = false; btn.textContent = "🔮 Consultar mi Horóscopo";
+  }
+};
+
+/* ============ RENDER ============ */
+function pintar(sg, j){
+  resultado.style.display = "block";
+  const nivel = v => Math.max(0, Math.min(100, parseInt(v) || 0));
+  const secs = [["❤️ Amor y Relaciones", j.amor],["💰 Dinero y Trabajo", j.dinero],["🧠 Salud y Bienestar", j.salud]];
+  const nums = (Array.isArray(j.numeros) ? j.numeros : []).slice(0,5);
+  const etiqueta = {hoy:"Hoy", "mañana":"Mañana", semana:"Esta semana"}[periodo];
+
+  resultado.innerHTML = `
+  <div class="card">
+    <div class="hero">
+      <div class="gs">${sg.s}</div>
+      <h2>${sg.n}</h2>
+      <div class="chips"><span class="chip">${esc(etiqueta)}</span><span class="chip">${sg.e}</span><span class="chip">Regente: ${sg.p}</span></div>
+    </div>
+    ${j.resumen ? `<p class="resumen">${esc(j.resumen)}</p>` : ""}
+    ${secs.map((s,i)=>`
+      <div class="sec" style="animation-delay:${i*.2}s">
+        <div class="sec-top"><h3>${s[0]}</h3><span class="pct">${nivel(s[1]?.nivel)}%</span></div>
+        <div class="barra"><i data-w="${nivel(s[1]?.nivel)}"></i></div>
+        <p>${esc(s[1]?.texto)}</p>
+      </div>`).join("")}
+    <div class="datos">
+      <div class="dato full" style="animation-delay:.7s"><small>🔢 Números de la suerte</small><div class="nums">${nums.map(n=>`<span>${esc(n)}</span>`).join("")}</div></div>
+      <div class="dato" style="animation-delay:.8s"><small>🎨 Color</small><b>${esc(j.color)}</b></div>
+      <div class="dato" style="animation-delay:.9s"><small>💞 Compatible</small><b>${esc(j.compatible)}</b></div>
+    </div>
+    <div class="cita">“${esc(j.frase)}”</div>
+    <div class="acciones">
+      <button class="btn btn-sec" id="btnComp">📤 Compartir</button>
+      <button class="btn btn-sec" id="btnOtro">🔄 Otro signo</button>
+    </div>
+  </div>`;
+
+  requestAnimationFrame(()=>setTimeout(()=>{
+    document.querySelectorAll(".barra i").forEach(b => b.style.width = b.dataset.w + "%");
+  },150));
+
+  const plano = [`🔮 Horóscopo de ${sg.n} ${sg.s} — ${etiqueta}`, j.resumen,
+    ...secs.map(s=>`${s[0]} (${nivel(s[1]?.nivel)}%): ${s[1]?.texto}`),
+    `🔢 Números: ${nums.join(", ")}`, `🎨 Color: ${j.color}`, `💞 Compatible: ${j.compatible}`, `✨ ${j.frase}`].filter(Boolean).join("\n\n");
+
+  $("btnComp").onclick = async () => {
+    if(navigator.share){ try{ await navigator.share({title:"🔮 Mi Horóscopo — P&C DW", text:plano}); }catch{} }
+    else{
+      try{ await navigator.clipboard.writeText(plano); $("btnComp").textContent = "✔ Copiado"; }
+      catch{ $("btnComp").textContent = "No se pudo copiar"; }
+      setTimeout(()=>{ const b=$("btnComp"); if(b) b.textContent="📤 Compartir"; },1800);
+    }
+  };
+  $("btnOtro").onclick = () => window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ============ FONDO DE ESTRELLAS ============ */
+(function(){
+  const c = $("estrellas"), x = c.getContext("2d");
+  let W, H, est = [];
+  function ini(){
+    W = c.width = innerWidth; H = c.height = innerHeight;
+    est = Array.from({length: Math.min(90, Math.floor(W*H/9000))}, () => ({
+      x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.4+.3, t:Math.random()*6.28, v:Math.random()*.02+.005,
+      d:Math.random()<.2
+    }));
+  }
+  function dib(){
+    x.clearRect(0,0,W,H);
+    est.forEach(s => {
+      s.t += s.v;
+      x.globalAlpha = .35 + Math.sin(s.t)*.35;
+      x.fillStyle = s.d ? "#FFD700" : "#fff";
+      x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.283); x.fill();
+    });
+    requestAnimationFrame(dib);
+  }
+  addEventListener("resize", ini); ini();
+  if(!matchMedia("(prefers-reduced-motion: reduce)").matches) dib();
+  else { est.forEach(s=>{x.globalAlpha=.5;x.fillStyle="#fff";x.beginPath();x.arc(s.x,s.y,s.r,0,6.283);x.fill();}); }
+})();
+</script>
+</body>
+</html>

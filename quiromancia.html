@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>✋ Quiromancia — P&C DW</title>
+<style>
+:root{
+  --bg1:#1d0f07; --bg2:#3a2214;
+  --cobre:#E09F6E; --oro:#FFC107; --terra:#D47646;
+  --texto:#FFFAF5; --suave:#E0C8B0;
+  --card:rgba(224,159,110,.10); --borde:rgba(224,159,110,.35);
+  --sombra:0 10px 40px rgba(0,0,0,.35);
+  --menu-fondo:rgba(29,15,7,.95);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:radial-gradient(1200px 600px at 50% -10%,#5a3520 0%,transparent 60%),linear-gradient(180deg,var(--bg1),var(--bg2) 55%,var(--bg1));
+  color:var(--texto);min-height:100vh;padding:70px 16px 48px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(2px 2px at 40px 60px,rgba(255,193,7,.5),transparent),radial-gradient(1.5px 1.5px at 130px 90px,rgba(224,159,110,.45),transparent),radial-gradient(1px 1px at 200px 30px,rgba(255,250,245,.5),transparent);
+  background-size:260px 260px}
+
+/* ===== MENÚ DE NAVEGACIÓN ===== */
+.menu-superior{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--menu-fondo);backdrop-filter:blur(12px);padding:10px 16px;border-bottom:1px solid rgba(255,193,7,.2)}
+.menu-contenido{max-width:440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.menu-marca{font-weight:900;font-size:18px;color:var(--oro)}
+.menu-botones{display:flex;gap:6px}
+.menu-btn{background:transparent;border:none;color:var(--suave);font-size:12px;padding:6px 9px;border-radius:8px;cursor:pointer;transition:.2s}
+.menu-btn.activo{background:rgba(255,193,7,.15);color:var(--oro)}
+
+.wrap{max-width:440px;margin:0 auto;position:relative;z-index:1}
+
+/* Cabecera */
+header{text-align:center;margin:8px 0 22px}
+.logo{font-size:52px;display:inline-block;animation:flot 3.2s ease-in-out infinite;filter:drop-shadow(0 6px 14px rgba(255,193,7,.35))}
+@keyframes flot{50%{transform:translateY(-7px)}}
+h1{font-size:28px;font-weight:800;letter-spacing:.3px;margin-top:6px;background:linear-gradient(90deg,var(--cobre),var(--oro));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--suave);font-size:14.5px;line-height:1.5;margin-top:6px}
+
+/* Pasos */
+.pasos{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px}
+.paso{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--suave);opacity:.55;transition:.3s}
+.paso b{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;border:1.5px solid var(--borde)}
+.paso.on{opacity:1;color:var(--oro)}
+.paso.on b{background:linear-gradient(135deg,var(--terra),var(--oro));color:#1d0f07;border-color:transparent}
+.paso.ok{opacity:1}
+.paso.ok b{background:rgba(255,193,7,.18);border-color:var(--oro);color:var(--oro)}
+.sep{width:22px;height:1px;background:var(--borde)}
+
+/* Tarjetas */
+.card{background:var(--card);border:1px solid var(--borde);border-radius:22px;padding:20px;margin-bottom:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--sombra)}
+.card h2{font-size:15px;color:var(--oro);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+/* Zona de foto */
+.drop{position:relative;aspect-ratio:4/5;border-radius:18px;border:2px dashed var(--borde);background:rgba(0,0,0,.28);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;overflow:hidden}
+.drop .hand{font-size:74px;opacity:.5;margin-bottom:10px}
+.drop p{color:var(--suave);font-size:14px;line-height:1.55}
+.drop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.drop.has img{display:block}
+.drop.has .vacio{display:none}
+.drop.has{border-style:solid;border-color:var(--oro)}
+.scan{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--oro),transparent);box-shadow:0 0 18px var(--oro);top:0;display:none;animation:scan 1.8s ease-in-out infinite}
+.drop.busy .scan{display:block}
+.drop.busy img{filter:brightness(.8)}
+@keyframes scan{0%,100%{top:2%}50%{top:96%}}
+.quitar{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:none;background:rgba(0,0,0,.6);color:#fff;font-size:18px;cursor:pointer;display:none;z-index:3}
+.drop.has .quitar{display:block}
+.estado-foto{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.65);color:var(--suave);font-size:12px;padding:6px 12px;border-radius:20px;display:none;z-index:3}
+.estado-foto.show{display:block}
+
+.fila{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.btn{border:none;cursor:pointer;font-weight:700;font-size:15px;border-radius:14px;padding:15px 10px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn:active{transform:scale(.97)}
+.btn-sec{background:rgba(255,193,7,.10);border:1px solid var(--oro);color:var(--oro)}
+.btn-sec:hover{background:rgba(255,193,7,.2)}
+.btn-pri{background:linear-gradient(135deg,var(--terra),var(--oro));color:#1d0f07;font-size:17px;padding:18px;box-shadow:0 8px 24px rgba(212,118,70,.4)}
+.btn-pri:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.consejos{margin-top:14px;font-size:12.5px;color:var(--suave);line-height:1.7}
+.consejos span{display:inline-block;background:rgba(255,193,7,.08);border-radius:10px;padding:3px 10px;margin:2px 4px 2px 0}
+
+/* Texto opcional */
+label{display:block;font-size:14px;color:var(--cobre);font-weight:600;margin-bottom:10px}
+textarea{width:100%;min-height:96px;resize:none;padding:14px 16px;font-size:16px;line-height:1.6;border-radius:14px;border:2px solid rgba(224,159,110,.3);background:rgba(0,0,0,.35);color:var(--texto);outline:none;transition:.3s}
+textarea:focus{border-color:var(--oro);box-shadow:0 0 0 3px rgba(255,193,7,.15)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.tag{background:rgba(255,193,7,.12);color:var(--oro);padding:8px 13px;border-radius:20px;font-size:12.5px;cursor:pointer;border:1px solid transparent;transition:.2s}
+.tag:hover{border-color:var(--oro)}
+
+/* Guía líneas */
+.lineas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.li{background:rgba(255,193,7,.07);border-left:3px solid var(--oro);border-radius:12px;padding:11px}
+.li b{display:block;font-size:13px;color:var(--cobre);margin-bottom:3px}
+.li span{font-size:11.5px;color:var(--suave);line-height:1.4}
+
+/* Resultado */
+#resultado{display:none}
+.cargando{text-align:center;padding:34px 10px;color:var(--cobre)}
+.spinner{width:44px;height:44px;border:3px solid rgba(224,159,110,.2);border-top-color:var(--oro);border-radius:50%;animation:gira 1s linear infinite;margin:0 auto 14px}
+@keyframes gira{to{transform:rotate(360deg)}}
+.res-titulo{text-align:center;font-size:21px;font-weight:800;color:var(--oro);padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid rgba(255,193,7,.25)}
+.intro{font-size:15px;line-height:1.75;color:var(--suave);font-style:italic;margin-bottom:16px;text-align:center}
+.linea{background:rgba(0,0,0,.22);border:1px solid rgba(224,159,110,.22);border-left:4px solid var(--oro);border-radius:14px;padding:14px 16px;margin-bottom:12px;opacity:0;transform:translateY(12px);animation:ap .5s ease forwards}
+.linea h3{font-size:15px;color:var(--cobre);margin-bottom:6px}
+.linea p{font-size:15px;line-height:1.75}
+@keyframes ap{to{opacity:1;transform:none}}
+.mensaje{margin-top:18px;padding:18px;border-radius:16px;text-align:center;background:linear-gradient(135deg,rgba(212,118,70,.25),rgba(255,193,7,.15));border:1px solid var(--oro);opacity:0;animation:ap .6s ease 1s forwards}
+.mensaje h3{color:var(--oro);font-size:15px;margin-bottom:8px}
+.mensaje p{line-height:1.75;font-size:15.5px}
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.error{text-align:center;padding:10px}
+.error .t{font-size:17px;color:#ffb3a0;margin-bottom:8px}
+.error .d{font-size:14px;color:var(--suave);line-height:1.6}
+.aviso{margin-top:22px;font-size:11.5px;color:var(--suave);text-align:center;opacity:.7;line-height:1.6}
+.oculto{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ===== MENÚ ===== -->
+<nav class="menu-superior">
+  <div class="menu-contenido">
+    <span class="menu-marca">P&C DW</span>
+    <div class="menu-botones">
+      <button class="menu-btn" onclick="window.location.href='index.html'">🔮 Horóscopo</button>
+      <button class="menu-btn" onclick="window.location.href='tarot.html'">🃏 Tarot</button>
+      <button class="menu-btn activo">✋ Quiromancia</button>
+      <button class="menu-btn" onclick="window.location.href='rituales.html'">🪄</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header>
+  <div class="logo">✋</div>
+  <h1>Lectura de la Mano</h1>
+  <p class="sub">Sube una foto de tu palma y descubre lo que dicen tus líneas</p>
+</header>
+
+<div class="pasos">
+  <div class="paso on" id="p1"><b>1</b>Foto</div><div class="sep"></div>
+  <div class="paso" id="p2"><b>2</b>Detalles</div><div class="sep"></div>
+  <div class="paso" id="p3"><b>3</b>Lectura</div>
+</div>
+
+<!-- Paso 1: Foto -->
+<section class="card" id="cardFoto">
+  <h2>📸 Foto de tu palma</h2>
+  <div class="drop" id="drop">
+    <div class="vacio">
+      <div class="hand">🖐️</div>
+      <p>Toma una foto de tu <b>palma abierta</b><br>o elige una de tu galería</p>
+    </div>
+    <img id="preview" alt="Vista previa de tu mano">
+    <div class="scan"></div>
+    <button class="quitar" id="btnQuitar" title="Quitar foto" aria-label="Quitar foto">✕</button>
+    <div class="estado-foto" id="estadoFoto"></div>
+  </div>
+
+  <div class="fila">
+    <button class="btn btn-sec" id="btnCamara">📷 Tomar foto</button>
+    <button class="btn btn-sec" id="btnGaleria">🖼️ Galería</button>
+  </div>
+  <input type="file" id="inCamara" accept="image/*" capture="environment" class="oculto">
+  <input type="file" id="inGaleria" accept="image/*" class="oculto">
+
+  <div class="consejos">
+    <span>☀️ Buena luz</span><span>🖐️ Palma abierta</span><span>📏 Dedos juntos</span><span>🎯 Enfocada</span>
+  </div>
+</section>
+
+<!-- Paso 2: Detalles opcionales -->
+<section class="card" id="cardTexto">
+  <h2>✍️ Detalles adicionales <span style="font-weight:400;color:var(--suave);font-size:12px">(opcional con foto)</span></h2>
+  <div class="tags">
+    <span class="tag" data-t="Líneas largas, profundas y claras. La línea del corazón es larga y curva.">Líneas profundas</span>
+    <span class="tag" data-t="Líneas cortas y suaves, con muchas líneas pequeñas que se cruzan.">Líneas cortas y marcas</span>
+    <span class="tag" data-t="Línea de la Vida muy marcada y curva. Línea del Destino bien definida.">Vida y Destino marcadas</span>
+    <span class="tag" data-t="Línea del Corazón corta y recta. Línea de la Cabeza larga y curva.">Corazón recto, Cabeza larga</span>
+  </div>
+  <label for="descripcion">¿Algo más que quieras contar? (mano dominante, marcas, preguntas…)</label>
+  <textarea id="descripcion" placeholder="Ej: Soy diestra, esta es mi mano derecha. Me interesa saber sobre mi camino profesional…"></textarea>
+</section>
+
+<button class="btn btn-pri" id="btnLeer">✋ Revelar mi Destino</button>
+
+<section class="card" id="resultado" style="margin-top:20px"></section>
+
+<section class="card" id="guia">
+  <h2>📖 Las 4 líneas principales</h2>
+  <div class="lineas">
+    <div class="li"><b>❤️ Corazón</b><span>Amor, emociones, relaciones</span></div>
+    <div class="li"><b>🧠 Cabeza</b><span>Mente, decisiones, creatividad</span></div>
+    <div class="li"><b>💪 Vida</b><span>Vitalidad, energía, cambios</span></div>
+    <div class="li"><b>🎯 Destino</b><span>Camino, propósito, trayectoria</span></div>
+  </div>
+</section>
+
+<p class="aviso">✨ Lectura con fines de entretenimiento y reflexión personal.<br>Tu futuro lo construyes tú cada día.</p>
+</div>
+
+<!-- ===== FIREBASE ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+// ✅ TU CONFIGURACIÓN
+const firebaseConfig = {
+  apiKey: "AIzaSyCbqPKfCYfDkFeAPMVyTNOfYu187hX8PR4",
+  authDomain: "flutter-match-e246c.firebaseapp.com",
+  projectId: "flutter-match-e246c",
+  storageBucket: "flutter-match-e246c.firebasestorage.app",
+  messagingSenderId: "531038667205",
+  appId: "1:531038667205:web:1fafca6491ccc3f39c0bac",
+  measurementId: "G-SGBGJFXG8H"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ☁️ CLOUDINARY
+const CLOUD_NAME    = "e1pqtuj2";
+const UPLOAD_PRESET = "genialapss"; // ← Asegúrate de que tu preset sea "Unsigned"
+
+const MODELO = "gpt-4o-mini";
+
+/* ============ OBTENER CLAVE DESDE FIRESTORE ============ */
+async function obtenerClaveOpenAI() {
+  try {
+    const ref = doc(db, "configuracion", "openai_api");
+    const snap = await getDoc(ref);
+    
+    if (!snap.exists) throw new Error("Configuración no encontrada en Firestore");
+    const datos = snap.data();
+    if (!datos.activa) throw new Error("Clave desactivada");
+    
+    return datos.clave;
+  } catch (error) {
+    console.error("Error leyendo clave:", error);
+    throw error;
+  }
+}
+
+/* ============ ELEMENTOS ============ */
+const $ = id => document.getElementById(id);
+const drop = $("drop"), preview = $("preview"), estadoFoto = $("estadoFoto");
+const btnLeer = $("btnLeer"), resultado = $("resultado"), desc = $("descripcion");
+let archivo = null;
+let urlNube = null;
+
+/* ============ UTILIDADES ============ */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&","<":"<",">":">",'"':"&quot;","'":"&#39;"}[c]));
+function paso(n){
+  ["p1","p2","p3"].forEach((id,i)=>{
+    const el=$(id); el.classList.remove("on","ok");
+    if(i+1<n) el.classList.add("ok"); else if(i+1===n) el.classList.add("on");
+  });
+}
+function setEstado(t){ estadoFoto.textContent=t; estadoFoto.classList.toggle("show",!!t); }
+
+/* ============ FOTO ============ */
+$("btnCamara").onclick  = () => $("inCamara").click();
+$("btnGaleria").onclick = () => $("inGaleria").click();
+$("inCamara").onchange  = e => elegir(e.target.files[0]);
+$("inGaleria").onchange = e => elegir(e.target.files[0]);
+$("btnQuitar").onclick  = quitarFoto;
+
+function elegir(f){
+  if(!f) return;
+  if(!f.type.startsWith("image/")){ alert("Por favor elige una imagen válida."); return; }
+  if(f.size > 15*1024*1024){ alert("La imagen es muy pesada (máx. 15 MB)."); return; }
+  archivo = f; urlNube = null;
+  preview.src = URL.createObjectURL(f);
+  drop.classList.add("has");
+  setEstado("✔ Foto lista");
+  paso(2);
+}
+function quitarFoto(){
+  archivo = null; urlNube = null; preview.removeAttribute("src");
+  drop.classList.remove("has","busy"); setEstado("");
+  $("inCamara").value = ""; $("inGaleria").value = "";
+  paso(1);
+}
+document.querySelectorAll(".tag").forEach(t => t.onclick = () => { desc.value = t.dataset.t; desc.focus(); });
+
+/* ============ SUBIR A CLOUDINARY ============ */
+async function subirCloudinary(file, API_KEY){
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", UPLOAD_PRESET);
+  fd.append("folder", "quiromancia");
+  const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:"POST", body:fd });
+  const d = await r.json();
+  if(!r.ok || !d.secure_url) throw new Error("Cloudinary: " + (d.error?.message || "no se pudo subir"));
+  return d.secure_url.replace("/upload/", "/upload/c_limit,w_1280,q_auto:good,f_jpg/");
+}
+
+/* ============ SISTEMA DE LECTURA ============ */
+const SISTEMA = `Eres un quiromante experto, respetuoso y sabio, con décadas de experiencia. Analiza las 4 líneas: corazón, cabeza, vida y destino. Sé positivo y constructivo. No hagas predicciones médicas ni de muerte.
+Responde SOLO con JSON:
+{"valida":true,"aviso":"","intro":"2 frases","corazon":"60-80 palabras","cabeza":"60-80 palabras","vida":"60-80 palabras","destino":"60-80 palabras","mensaje":"40-60 palabras recordando que el futuro lo construyes tú"}`;
+
+/* ============ LEER ============ */
+btnLeer.onclick = async () => {
+  const API_KEY = await obtenerClaveOpenAI();
+  const texto = desc.value.trim();
+  
+  if(!archivo && texto.length < 15){
+    alert("✋ Sube una foto de tu palma o describe tu mano con más detalle.");
+    return;
+  }
+  
+  btnLeer.disabled = true; btnLeer.textContent = "✋ Leyendo tus líneas...";
+  resultado.style.display = "block";
+  resultado.innerHTML = `<div class="cargando"><div class="spinner"></div><p id="msgCarga">Preparando tu lectura…</p></div>`;
+  resultado.scrollIntoView({behavior:"smooth", block:"start"});
+  const msg = t => { const m=$("msgCarga"); if(m) m.textContent=t; };
+  paso(3);
+
+  try{
+    const contenido = [];
+    let intro = archivo
+      ? "Esta es la foto de mi palma. Haz una lectura completa."
+      : "No tengo foto; describe mi mano con los detalles.";
+    if(texto) intro += ` Comentarios: "${texto}".`;
+    contenido.push({type:"text", text:intro});
+
+    if(archivo){
+      if(!urlNube){
+        drop.classList.add("busy"); setEstado("☁️ Subiendo foto…");
+        msg("Subiendo tu foto…");
+        urlNube = await subirCloudinary(archivo, API_KEY);
+      }
+      setEstado("🔮 Analizando líneas…");
+      msg("Observando tus líneas…");
+      contenido.push({type:"image_url", image_url:{url:urlNube, detail:"high"}});
+    }
+
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${API_KEY}` },
+      body: JSON.stringify({
+        model: MODELO, temperature: 0.8, max_tokens: 1200,
+        response_format: { type:"json_object" },
+        messages: [
+          { role:"system", content: SISTEMA },
+          { role:"user", content: contenido }
+        ]
+      })
+    });
+    
+    if(!r.ok) throw new Error("Error de la API");
+    const datos = await r.json();
+    const j = JSON.parse(datos.choices[0].message.content);
+
+    if(j.valida === false){
+      resultado.innerHTML = `<div class="error"><p class="t">🖐️ No pude ver bien tu palma</p><p class="d">${esc(j.aviso || "Toma la foto con buena luz, palma abierta y enfocada.")}</p>
+        <button class="btn btn-sec" style="margin-top:16px" id="btnOtra">📷 Probar otra foto</button></div>`;
+      $("btnOtra").onclick = () => { quitarFoto(); resultado.style.display="none"; };
+      paso(1);
+      return;
+    }
+    
+    pintar(j);
+  }catch(e){
+    console.error(e);
+    resultado.innerHTML = `<div class="error"><p class="t">⚠️ No pudimos completar la lectura</p>
+      <p class="d">${esc(e.message) || "Inténtalo de nuevo en unos momentos."}</p>
+      <button class="btn btn-pri" style="margin-top:16px" id="btnRe">✋ Reintentar</button></div>`;
+    $("btnRe").onclick = () => btnLeer.click();
+    paso(2);
+  }finally{
+    drop.classList.remove("busy");
+    if(archivo) setEstado("✔ Foto lista");
+    btnLeer.disabled = false; btnLeer.textContent = "✋ Revelar mi Destino";
+  }
+};
+
+function pintar(j){
+  const bloques = [
+    ["❤️ Línea del Corazón", j.corazon],
+    ["🧠 Línea de la Cabeza", j.cabeza],
+    ["💪 Línea de la Vida", j.vida],
+    ["🎯 Línea del Destino", j.destino]
+  ];
+  resultado.innerHTML = `
+    <div class="res-titulo">✨ Tu Lectura Quiromántica</div>
+    ${j.intro ? `<p class="intro">${esc(j.intro)}</p>` : ""}
+    ${bloques.map((b,i)=>`<div class="linea" style="animation-delay:${i*.25}s"><h3>${b[0]}</h3><p>${esc(b[1])}</p></div>`).join("")}
+    <div class="mensaje"><h3>🌟 Mensaje para ti</h3><p>${esc(j.mensaje)}</p></div>
+    <div class="acciones">
+      <button class="btn btn-sec" id="btnCopiar">📋 Copiar</button>
+      <button class="btn btn-sec" id="btnNueva">✋ Nueva lectura</button>
+    </div>`;
+    
+  const plano = ["✨ Mi lectura Quiromántica", j.intro, ...bloques.map(b=>`${b[0]}: ${b[1]}`), "🌟 "+j.mensaje].filter(Boolean).join("\n\n");
+  
+  $("btnCopiar").onclick = async () => {
+    try{ await navigator.clipboard.writeText(plano); $("btnCopiar").textContent="✔ Copiado"; }
+    catch{ $("btnCopiar").textContent="No se pudo copiar"; }
+    setTimeout(()=>{ const b=$("btnCopiar"); if(b) b.textContent="📋 Copiar"; },1800);
+  };
+  $("btnNueva").onclick = () => { quitarFoto(); desc.value=""; resultado.style.display="none"; };
+}
+</script>
+</body>
+</html>

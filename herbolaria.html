@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🌿 Herbolaria — P&C DW</title>
+<style>
+:root{
+  --bg1:#0F2419; --bg2:#245039;
+  --verde:#4ADE80; --verde2:#22C55E; --oro:#FBBF24; --tierra:#D97706;
+  --texto:#F0FDF4; --suave:#BBF7D0;
+  --card:rgba(74,222,128,.08); --borde:rgba(74,222,128,.30);
+  --sombra:0 10px 40px rgba(0,0,0,.38);
+  --menu-fondo:rgba(15,36,25,.95);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;color:var(--texto);padding:70px 16px 56px;overflow-x:hidden;
+  background:radial-gradient(800px 500px at 85% -5%,rgba(74,222,128,.28),transparent 60%),radial-gradient(700px 500px at 0% 40%,rgba(251,191,36,.10),transparent 60%),linear-gradient(180deg,var(--bg1),var(--bg2) 55%,var(--bg1))}
+#hojas{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+/* ===== MENÚ DE NAVEGACIÓN ===== */
+.menu-superior{position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--menu-fondo);backdrop-filter:blur(12px);padding:10px 16px;border-bottom:1px solid rgba(74,222,128,.2)}
+.menu-contenido{max-width:460px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.menu-marca{font-weight:900;font-size:18px;color:var(--verde)}
+.menu-botones{display:flex;gap:6px}
+.menu-btn{background:transparent;border:none;color:var(--suave);font-size:11px;padding:6px 8px;border-radius:8px;cursor:pointer;transition:.2s}
+.menu-btn.activo{background:rgba(74,222,128,.18);color:var(--texto)}
+
+.wrap{max-width:460px;margin:0 auto;position:relative;z-index:1}
+
+header{text-align:center;margin:6px 0 20px}
+.logo{font-size:52px;display:inline-block;animation:flot 4s ease-in-out infinite;filter:drop-shadow(0 6px 16px rgba(74,222,128,.45))}
+@keyframes flot{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-7px) rotate(4deg)}}
+h1{font-size:26px;font-weight:800;margin-top:4px;line-height:1.25;background:linear-gradient(90deg,var(--verde),var(--oro));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--suave);font-size:14.5px;margin-top:6px;line-height:1.5}
+
+.modos{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:rgba(0,0,0,.3);border:1px solid var(--borde);border-radius:16px;padding:4px;margin-bottom:16px}
+.modo{border:none;background:transparent;color:var(--suave);font-size:14px;font-weight:600;padding:12px 4px;border-radius:12px;cursor:pointer;transition:.25s}
+.modo.on{background:linear-gradient(135deg,var(--verde2),var(--oro));color:#0b2014;box-shadow:0 4px 14px rgba(34,197,94,.35)}
+
+.card{background:var(--card);border:1px solid var(--borde);border-radius:22px;padding:18px;margin-bottom:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--sombra)}
+.card h2{font-size:14.5px;font-weight:700;color:var(--verde);margin-bottom:12px}
+.card h2 small{font-weight:400;color:var(--suave);font-size:12px}
+.oculto{display:none!important}
+
+input[type=text],textarea{width:100%;padding:15px 16px;font-size:16px;border-radius:14px;border:2px solid rgba(74,222,128,.3);background:rgba(0,0,0,.3);color:var(--texto);outline:none;transition:.3s}
+input[type=text]:focus,textarea:focus{border-color:var(--verde);box-shadow:0 0 0 3px rgba(74,222,128,.15)}
+textarea{min-height:104px;resize:none;line-height:1.65}
+.pie{display:flex;justify-content:flex-end;font-size:12px;color:var(--suave);margin-top:8px}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.it{background:rgba(0,0,0,.24);border:1.5px solid rgba(74,222,128,.2);border-radius:14px;padding:10px 2px 8px;text-align:center;cursor:pointer;color:var(--texto);transition:.2s}
+.it span{display:block;font-size:25px;margin-bottom:3px}
+.it b{font-size:10.5px;font-weight:600;color:var(--suave);line-height:1.2;display:block}
+.it:hover,.it.on{border-color:var(--verde);background:rgba(74,222,128,.18);transform:translateY(-2px)}
+.grid.g3{grid-template-columns:repeat(4,1fr);margin-top:0;margin-bottom:14px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(251,191,36,.10);color:var(--oro);padding:8px 13px;border-radius:20px;font-size:13px;cursor:pointer;border:1.5px solid transparent;transition:.2s;user-select:none}
+.chip.on{border-color:var(--oro);background:rgba(251,191,36,.24);font-weight:600}
+
+.btn{border:none;cursor:pointer;font-weight:700;border-radius:15px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn:active{transform:scale(.97)}
+.btn-pri{background:linear-gradient(135deg,var(--verde2),var(--oro));color:#0b2014;font-size:17px;padding:17px;box-shadow:0 8px 24px rgba(34,197,94,.38)}
+.btn-pri:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-sec{background:rgba(74,222,128,.10);border:1px solid var(--verde);color:var(--verde);font-size:14px;padding:13px}
+.btn-sec:hover{background:rgba(74,222,128,.2)}
+
+/* Resultado */
+#resultado{display:none;margin-top:22px}
+.top{text-align:center;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid rgba(251,191,36,.22)}
+.top .em{font-size:48px;line-height:1;filter:drop-shadow(0 0 16px rgba(74,222,128,.5))}
+.top h2{font-size:22px;font-weight:800;color:var(--oro);margin-top:8px;line-height:1.25}
+.top i{display:block;font-size:13.5px;color:var(--suave);margin-top:3px}
+.resumen{font-size:15.5px;line-height:1.75;color:var(--suave);text-align:center;font-style:italic;margin-bottom:16px}
+.bl{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--verde);border-radius:16px;padding:14px 15px;margin-bottom:12px;opacity:0;animation:ap .5s ease forwards}
+.bl h3{font-size:14.5px;color:var(--verde);margin-bottom:8px}
+.bl p{font-size:15px;line-height:1.7}
+.bl ul{list-style:none}
+.bl li{position:relative;padding-left:22px;font-size:14.8px;line-height:1.65;margin-bottom:6px}
+.bl li::before{content:'🍃';position:absolute;left:0;top:1px;font-size:13px}
+.bl ol{padding-left:22px}
+.bl ol li{padding-left:4px;list-style:decimal}
+.bl ol li::before{content:none}
+.bl.prec{border-left-color:var(--oro);background:rgba(251,191,36,.07)}
+.bl.prec h3{color:var(--oro)}
+.bl.prec li::before{content:'⚠️'}
+.bl.alerta{border-left-color:#f87171;background:rgba(248,113,113,.09)}
+.bl.alerta h3{color:#fca5a5}
+.bl.alerta li::before{content:'🚨'}
+.dosis{display:inline-block;margin-top:6px;font-size:13px;color:var(--oro);background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.28);border-radius:12px;padding:5px 11px}
+.pl{display:flex;gap:12px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px dashed rgba(255,255,255,.12)}
+.pl:last-child{border:none;margin:0;padding:0}
+.pl .e{font-size:30px;flex:none;width:38px;text-align:center}
+.pl b{display:block;color:var(--oro);font-size:15.5px;margin-bottom:3px}
+.pl p{font-size:14.5px;line-height:1.65;margin-bottom:4px}
+.pl .lb{color:var(--verde);font-weight:700}
+@keyframes ap{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+
+.cargando{text-align:center;padding:34px 10px;color:var(--verde)}
+.spinner{width:44px;height:44px;border:3px solid rgba(74,222,128,.2);border-top-color:var(--verde);border-radius:50%;animation:gira 1s linear infinite;margin:0 auto 14px}
+@keyframes gira{to{transform:rotate(360deg)}}
+.error{text-align:center;padding:12px}
+.error .t{font-size:17px;color:#ff9f9f;margin-bottom:6px}
+.error .d{font-size:14px;color:var(--suave)}
+.aviso-imp{background:rgba(251,191,36,.09);border:1px solid rgba(251,191,36,.35);border-radius:14px;padding:14px;margin-top:6px;font-size:12.8px;color:#FDE68A;line-height:1.65}
+</style>
+</head>
+<body>
+<canvas id="hojas"></canvas>
+
+<!-- ===== MENÚ ===== -->
+<nav class="menu-superior">
+  <div class="menu-contenido">
+    <span class="menu-marca">P&C DW</span>
+    <div class="menu-botones">
+      <button class="menu-btn" onclick="window.location.href='index.html'">🔮</button>
+      <button class="menu-btn" onclick="window.location.href='tarot.html'">🃏</button>
+      <button class="menu-btn" onclick="window.location.href='quiromancia.html'">✋</button>
+      <button class="menu-btn" onclick="window.location.href='suenos.html'">🌙</button>
+      <button class="menu-btn activo">🌿</button>
+      <button class="menu-btn" onclick="window.location.href='rituales.html'">🪄</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header>
+  <div class="logo">🌿</div>
+  <h1>Herbolaria y Plantas Medicinales</h1>
+  <p class="sub">La naturaleza tiene el remedio: la sabiduría ancestral a tu alcance</p>
+</header>
+
+<div class="modos">
+  <button class="modo on" data-m="planta">🌱 Por planta</button>
+  <button class="modo" data-m="dolencia">🩺 Por dolencia</button>
+</div>
+
+<!-- Por planta -->
+<section class="card" id="secPlanta">
+  <h2>🌿 ¿Qué planta deseas conocer?</h2>
+  <input type="text" id="planta" maxlength="60" placeholder="Ej: manzanilla, sábila, ruda, jengibre…" autocomplete="off">
+  <div class="grid" id="gPlantas"></div>
+</section>
+
+<!-- Por dolencia -->
+<div id="secDolencia" class="oculto">
+  <section class="card">
+    <h2>🩺 ¿Qué malestar deseas aliviar?</h2>
+    <div class="grid g3" id="gCats"></div>
+    <textarea id="dolencia" maxlength="400" placeholder="Describe tu malestar: dolor de estómago, insomnio, tos, dolor de cabeza leve, estrés…"></textarea>
+    <div class="pie"><span id="cont">0/400</span></div>
+  </section>
+</div>
+
+<section class="card">
+  <h2>🛡️ Para tu seguridad <small>(marca lo que aplique)</small></h2>
+  <div class="chips" id="seguridad"></div>
+</section>
+
+<button class="btn btn-pri" id="btnBuscar">🌿 Descubrir remedio</button>
+
+<section class="card" id="resultado"></section>
+
+<div class="aviso-imp">⚠️ <b>Aviso importante:</b> La herbolaria es un complemento y no sustituye el diagnóstico ni el tratamiento médico. Si estás embarazada o en lactancia, tomas medicamentos, tienes una enfermedad crónica o los síntomas son intensos o persisten, consulta primero a un profesional de la salud.</div>
+</div>
+
+<!-- ===== FIREBASE ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+// ✅ MISMA CONFIGURACIÓN COMPARTIDA
+const firebaseConfig = {
+  apiKey: "AIzaSyCbqPKfCYfDkFeAPMVyTNOfYu187hX8PR4",
+  authDomain: "flutter-match-e246c.firebaseapp.com",
+  projectId: "flutter-match-e246c",
+  storageBucket: "flutter-match-e246c.firebasestorage.app",
+  messagingSenderId: "531038667205",
+  appId: "1:531038667205:web:1fafca6491ccc3f39c0bac",
+  measurementId: "G-SGBGJFXG8H"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const MODELO = "gpt-4o-mini";
+
+/* ============ OBTENER CLAVE DESDE FIRESTORE ============ */
+async function obtenerClaveOpenAI() {
+  try {
+    const ref = doc(db, "configuracion", "openai_api");
+    const snap = await getDoc(ref);
+    
+    if (!snap.exists) throw new Error("Configuración no encontrada en Firestore");
+    const datos = snap.data();
+    if (!datos.activa) throw new Error("Clave desactivada");
+    
+    return datos.clave;
+  } catch (error) {
+    console.error("Error leyendo clave:", error);
+    throw error;
+  }
+}
+
+/* ============ DATOS ============ */
+const PLANTAS = [
+  ["🌼","Manzanilla","Manzanilla"],["🌵","Sábila","Sábila / Aloe Vera"],["🫚","Jengibre","Jengibre"],["💜","Lavanda","Lavanda"],
+  ["🍃","Ruda","Ruda"],["🌿","Hierbabuena","Hierbabuena"],["🌻","Diente de león","Diente de León"],["🌸","Valeriana","Valeriana"],
+  ["🍋","Toronjil","Toronjil"],["🫖","Té verde","Té verde"],["🌱","Menta","Menta"],["🧄","Ajo","Ajo"]
+];
+const CATS = [
+  ["🍽️","Digestión","problemas digestivos"],["😴","Sueño","dificultad para dormir"],["🧘","Estrés","estrés y nerviosismo"],["🤧","Respiración","tos y molestias respiratorias"],
+  ["🤕","Dolor leve","dolor de cabeza leve"],["🧴","Piel","molestias leves de la piel"],["🛡️","Defensas","apoyo a las defensas"],["⚡","Energía","cansancio y falta de energía"]
+];
+const SEGURIDAD = ["🤰 Embarazo / lactancia","💊 Tomo medicamentos","👶 Es para un niño","🩺 Tengo una enfermedad crónica","🌾 Tengo alergias"];
+
+/* ============ ELEMENTOS ============ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&","<":"<",">":">",'"':"&quot;","'":"&#39;"}[c]));
+const arr = a => Array.isArray(a) ? a : (a ? [a] : []);
+let modo = "planta";
+
+document.querySelectorAll(".modo").forEach(b => b.onclick = () => {
+  modo = b.dataset.m;
+  document.querySelectorAll(".modo").forEach(x => x.classList.toggle("on", x === b));
+  $("secPlanta").classList.toggle("oculto", modo !== "planta");
+  $("secDolencia").classList.toggle("oculto", modo !== "dolencia");
+  $("resultado").style.display = "none";
+});
+PLANTAS.forEach(p => {
+  const b = document.createElement("button"); b.type = "button"; b.className = "it";
+  b.innerHTML = `<span>${p[0]}</span><b>${p[1]}</b>`;
+  b.onclick = () => { $("planta").value = p[2]; document.querySelectorAll("#gPlantas .it").forEach(x => x.classList.toggle("on", x === b)); };
+  $("gPlantas").appendChild(b);
+});
+$("planta").oninput = () => document.querySelectorAll("#gPlantas .it").forEach(x => x.classList.remove("on"));
+CATS.forEach(c => {
+  const b = document.createElement("button"); b.type = "button"; b.className = "it";
+  b.innerHTML = `<span>${c[0]}</span><b>${c[1]}</b>`;
+  b.onclick = () => {
+    const ya = b.classList.contains("on");
+    document.querySelectorAll("#gCats .it").forEach(x => x.classList.remove("on"));
+    if(!ya){ b.classList.add("on"); if(!$("dolencia").value.trim()){ $("dolencia").value = c[2].charAt(0).toUpperCase() + c[2].slice(1) + ": "; $("cont").textContent = $("dolencia").value.length + "/400"; } }
+    $("dolencia").focus();
+  };
+  $("gCats").appendChild(b);
+});
+$("dolencia").oninput = e => $("cont").textContent = e.target.value.length + "/400";
+SEGURIDAD.forEach(s => {
+  const c = document.createElement("span"); c.className = "chip"; c.textContent = s;
+  c.onclick = () => c.classList.toggle("on");
+  $("seguridad").appendChild(c);
+});
+
+/* ============ IA ============ */
+const BASE = `Eres un herbolario y etnobotánico experto, con enfoque responsable y basado en el uso tradicional y la evidencia disponible. Tono cálido, claro y cercano. Reglas de seguridad: nunca sustituyes al médico ni diagnosticas; no prometes curas; usas cantidades moderadas; mencionas contraindicaciones; si la persona indicó condiciones de seguridad, adapta la respuesta con prudencia. Para síntomas graves, indica cuándo acudir a un profesional.`;
+
+const SISTEMA_PLANTA = BASE + `
+Responde SOLO con JSON válido:
+{"emoji":"","nombre":"","cientifico":"","resumen":"",
+"propiedades":[""],
+"usos":[""],
+"preparacion":[""],
+"dosis":"",
+"precauciones":[""],
+"consultar":""}`;
+
+const SISTEMA_DOLENCIA = BASE + `
+Responde SOLO con JSON válido:
+{"resumen":"",
+"plantas":[{"emoji":"","nombre":"","porque":"","preparacion":"","dosis":"","precaucion":""}],
+"habitos":[""],
+"alerta":[""],
+"consultar":""}
+Incluye 2 o 3 plantas.`;
+
+/* ============ BUSCAR ============ */
+$("btnBuscar").onclick = async () => {
+  const API_KEY = await obtenerClaveOpenAI();
+  
+  let consulta = "", sistema = "", usuario = "";
+  const seg = [...document.querySelectorAll("#seguridad .chip.on")].map(c => c.textContent.replace(/^\S+\s/,""));
+  const nota = seg.length ? ` Condiciones: ${seg.join(", ")}. Adapta con prudencia.` : "";
+
+  if(modo === "planta"){
+    consulta = $("planta").value.trim();
+    if(!consulta){ alert("🌿 Escribe el nombre de la planta"); return; }
+    sistema = SISTEMA_PLANTA; usuario = `Planta: "${consulta}". Información completa.${nota}`;
+  }else{
+    consulta = $("dolencia").value.trim();
+    if(consulta.length < 10){ alert("🩺 Describe tu malestar con más detalle"); return; }
+    sistema = SISTEMA_DOLENCIA; usuario = `Malestar: "${consulta}". Remedios naturales de apoyo.${nota}`;
+  }
+
+  const btn = $("btnBuscar"), R = $("resultado");
+  btn.disabled = true; btn.textContent = "🌿 Consultando...";
+  R.style.display = "block";
+  R.innerHTML = `<div class="cargando"><div class="spinner"></div><p>Conectando con la naturaleza…</p></div>`;
+  R.scrollIntoView({behavior:"smooth", block:"start"});
+
+  try{
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${API_KEY}` },
+      body: JSON.stringify({
+        model: MODELO, temperature: 0.6, max_tokens: 1500,
+        response_format:{ type:"json_object" },
+        messages:[{role:"system", content:sistema},{role:"user", content:usuario}]
+      })
+    });
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error?.message || "Error de la API");
+    const j = JSON.parse(d.choices[0].message.content);
+    modo === "planta" ? pintarPlanta(j) : pintarDolencia(j);
+  }catch(e){
+    console.error(e);
+    R.innerHTML = `<div class="error"><p class="t">⚠️ No pudimos conectar</p><p class="d">Inténtalo de nuevo en unos momentos.</p>
+      <button class="btn btn-pri" style="margin-top:16px" id="btnRe">🔄 Reintentar</button></div>`;
+    $("btnRe").onclick = () => btn.click();
+  }finally{
+    btn.disabled = false; btn.textContent = "🌿 Descubrir remedio";
+  }
+};
+
+/* ============ RENDER ============ */
+const lista = a => `<ul>${arr(a).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+const bl = (cls, t, html, i) => `<div class="bl ${cls}" style="animation-delay:${i*.15}s"><h3>${t}</h3>${html}</div>`;
+const acciones = `<div class="acciones"><button class="btn btn-sec" id="btnComp">📤 Compartir</button><button class="btn btn-sec" id="btnNueva">🔄 Nueva consulta</button></div>`;
+
+function conectar(plano){
+  $("btnComp").onclick = async () => {
+    if(navigator.share){ try{ await navigator.share({title:"🌿 Herbolaria — P&C DW", text:plano}); }catch{} }
+    else{
+      try{ await navigator.clipboard.writeText(plano); $("btnComp").textContent = "✔ Copiado"; }
+      catch{ $("btnComp").textContent = "No se pudo copiar"; }
+      setTimeout(()=>{ const b=$("btnComp"); if(b) b.textContent="📤 Compartir"; },1800);
+    }
+  };
+  $("btnNueva").onclick = () => {
+    $("planta").value = ""; $("dolencia").value = ""; $("cont").textContent = "0/400";
+    document.querySelectorAll(".it.on").forEach(x => x.classList.remove("on"));
+    $("resultado").style.display = "none"; window.scrollTo({top:0, behavior:"smooth"});
+  };
+}
+
+function pintarPlanta(j){
+  $("resultado").innerHTML = `
+    <div class="top"><div class="em">${esc(j.emoji || "🌿")}</div><h2>${esc(j.nombre)}</h2>${j.cientifico ? `<i>${esc(j.cientifico)}</i>` : ""}</div>
+    ${j.resumen ? `<p class="resumen">${esc(j.resumen)}</p>` : ""}
+    ${bl("", "💊 Propiedades", lista(j.propiedades), 0)}
+    ${bl("", "🧺 Usos", lista(j.usos), 1)}
+    ${bl("", "🫖 Preparación", `<ol>${arr(j.preparacion).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${j.dosis ? `<span class="dosis">⏰ ${esc(j.dosis)}</span>` : ""}`, 2)}
+    ${bl("prec", "⚠️ Precauciones", lista(j.precauciones), 3)}
+    ${bl("alerta", "🩺 Cuándo consultar al médico", `<p>${esc(j.consultar)}</p>`, 4)}
+    ${acciones}`;
+  conectar([`🌿 ${j.nombre}`, j.resumen, "Propiedades: " + arr(j.propiedades).join("; "), `Dosis: ${j.dosis}`, "⚠️ Precauciones: " + arr(j.precauciones).join("; ")].filter(Boolean).join("\n\n"));
+}
+
+function pintarDolencia(j){
+  const pl = arr(j.plantas);
+  $("resultado").innerHTML = `
+    <div class="top"><div class="em">🩺</div><h2>Remedios naturales de apoyo</h2></div>
+    ${j.resumen ? `<p class="resumen">${esc(j.resumen)}</p>` : ""}
+    ${bl("", "🌿 Plantas sugeridas", pl.map(p=>`
+      <div class="pl"><div class="e">${esc(p.emoji || "🌿")}</div><div>
+        <b>${esc(p.nombre)}</b>
+        <p>${esc(p.porque)}</p>
+        <p><span class="lb">Preparación:</span> ${esc(p.preparacion)}</p>
+        <span class="dosis">⏰ ${esc(p.dosis)}</span>
+        <p style="margin-top:6px;color:#FDE68A"><span class="lb" style="color:var(--oro)">⚠️ Ojo:</span> ${esc(p.precaucion)}</p>
+      </div></div>`).join(""), 0)}
+    ${bl("", "🌤️ Hábitos que ayudan", lista(j.habitos), 1)}
+    ${bl("alerta", "🚨 Acude al médico si…", lista(j.alerta), 2)}
+    ${j.consultar ? `<p class="resumen" style="margin-top:14px;font-size:14px">${esc(j.consultar)}</p>` : ""}
+    ${acciones}`;
+  conectar(["🩺 Remedios naturales de apoyo", j.resumen,
+    ...pl.map(p=>`${p.nombre}: ${p.porque} — ${p.preparacion} — ⚠️ ${p.precaucion}`),
+    "Hábitos: " + arr(j.habitos).join("; "), "🚨 Acude al médico si: " + arr(j.alerta).join("; ")].filter(Boolean).join("\n\n"));
+}
+
+/* ============ HOJAS FLOTANTES ============ */
+(function(){
+  const c = $("hojas"), x = c.getContext("2d");
+  let W, H, hs = [];
+  function ini(){
+    W = c.width = innerWidth; H = c.height = innerHeight;
+    hs = Array.from({length: Math.min(22, Math.floor(W*H/38000))}, () => nueva(true));
+  }
+  function nueva(ini){ return {x:Math.random()*W, y: ini ? Math.random()*H : -20, s:Math.random()*7+5, v:Math.random()*.35+.15, r:Math.random()*6.28, w:(Math.random()-.5)*.02, d:Math.random()*6.28, o:Math.random()*.25+.12, g:Math.random()<.25}; }
+  function dib(){
+    x.clearRect(0,0,W,H);
+    hs.forEach((h,i) => {
+      h.y += h.v; h.d += .012; h.x += Math.sin(h.d)*.4; h.r += h.w;
+      if(h.y > H+20) hs[i] = nueva(false);
+      x.save(); x.translate(h.x,h.y); x.rotate(h.r); x.globalAlpha = h.o;
+      x.fillStyle = h.g ? "#FBBF24" : "#4ADE80";
+      x.beginPath(); x.ellipse(0,0,h.s,h.s*.45,0,0,6.283); x.fill(); x.restore();
+    });
+    requestAnimationFrame(dib);
+  }
+  addEventListener("resize", ini); ini();
+  if(!matchMedia("(prefers-reduced-motion: reduce)").matches) dib();
+})();
+</script>
+</body>
+</html>
